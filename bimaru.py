@@ -3,10 +3,11 @@
 # Além das funções e classes já definidas, podem acrescentar outras que considerem pertinentes.
 
 # Grupo 00:
-# 00000 Nome1
+# 00000 Pedro M. P. Curvo
 # 00000 Nome2
 
 import sys
+import numpy as np
 from search import (
     Problem,
     Node,
@@ -35,36 +36,68 @@ class BimaruState:
 class Board:
     """Representação interna de um tabuleiro de Bimaru."""
 
+    def __init__(self, board: np.ndarray, col_number: np.ndarray, row_number: np.ndarray):
+        """Construtor da classe. Recebe um array bidimensional
+        (matriz) numpy com o conteúdo do tabuleiro."""
+        self.board = board
+        self.col_number = col_number 
+        self.row_number = row_number
+
+
     def get_value(self, row: int, col: int) -> str:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        # TODO
-        pass
+        return self.board[row][col]
 
     def adjacent_vertical_values(self, row: int, col: int) -> (str, str):
         """Devolve os valores imediatamente acima e abaixo,
         respectivamente."""
-        # TODO
-        pass
+        if row == 0:
+            return None, self.board[row + 1][col]
+        elif row == 9:
+            return self.board[row - 1][col], None
+        else:
+            return self.board[row - 1][col], self.board[row + 1][col]
 
     def adjacent_horizontal_values(self, row: int, col: int) -> (str, str):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        # TODO
-        pass
+        if col == 0:
+            return None, self.board[row][col + 1]
+        elif col == 9:
+            return self.board[row][col - 1], None
+        else:
+            return self.board[row][col - 1], self.board[row][col + 1]
+
+    def print(self):
+        """Imprime o tabuleiro."""
+        for row in self.board:
+            print(" ".join(row))
 
     @staticmethod
     def parse_instance():
         """Lê o test do standard input (stdin) que é passado como argumento
-        e retorna uma instância da classe Board.
+        e retorna uma instância da classe Board."""
+        # Creates the np array
+        board = np.zeros((10, 10), dtype=str)
+        print(board)
+        # Read the first line of txt file
+        line = sys.stdin.readline().split()
+        col = np.array([int(x) for x in line[1:]])
+        # Read the second line of txt file
+        line = sys.stdin.readline().split()
+        row = np.array([int(x) for x in line[1:]])
 
-        Por exemplo:
-            $ python3 bimaru.py < input_T01
 
-            > from sys import stdin
-            > line = stdin.readline().split()
-        """
+
+        # Number of Hints
+        n_hints = int(sys.stdin.readline())
+        # Read the hints
+        if n_hints > 0:
+            for _ in range(n_hints):
+                line = sys.stdin.readline().split()
+                board[int(line[1])][int(line[2])] = line[3]
         # TODO
-        pass
+        return Board(board, col, row)
 
     # TODO: outros metodos da classe
 
@@ -105,6 +138,8 @@ class Bimaru(Problem):
 
 
 if __name__ == "__main__":
+    board = Board.parse_instance()
+    board.print()
     # TODO:
     # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
