@@ -26,12 +26,13 @@ class BimaruState:
         if BimaruState.state_id == 0:
             Bimaru.fill_water_rows_cols(board)
             Bimaru.fill_water_around_ships(board)
+            self.ships = Bimaru.count_ships(board)
+        else:
+            self.ships = [0, 0, 0, 0]
         self.board = board
         self.id = BimaruState.state_id
         self.expectated_ships = [4, 3, 2, 1]
-        self.ships = [0, 0, 0, 0]
         BimaruState.state_id += 1
-        self.grids = [board]
 
     def __lt__(self, other):
         return self.id < other.id
@@ -146,8 +147,10 @@ class Bimaru(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         Bimaru.fill_water_rows_cols(board)
-        Bimaru.fill_water_around_ships(board)
+        Bimaru.fill_water_around_ship(board)
         self.board = board
+        self.expected_ships = [4, 3, 2, 1]
+        self.ships = Bimaru.count_ships(board)
         # TODO
         pass
 
@@ -252,8 +255,145 @@ class Bimaru(Problem):
                                 if board.board[i][j] not in ('r', 'R') and i != row or j > col:
                                     board.board[i][j] = 'w'
                     
-                        
+    @staticmethod
+    def count_ships(board: Board):
+        """Conta o número de barcos de cada tipo presentes no tabuleiro."""
+        ships = [0, 0, 0, 0]
+        for row in range(10):
+            for col in range(10):
+                # Count Single Ships
+                if board.board[row][col] in ('c', 'C'):
+                    ships[0] += 1
+                # Count Vertical Ships
+                if board.board[row][col] in ('t', 'T'):
+                    ship_length = 1
+                    for i in range(row + 1, row + 4):
+                        if i < 10 and board.board[i][col] in ('m', 'M'):
+                            ship_length += 1
+                        if i < 10 and board.board[i][col] in ('b', 'B'):
+                            ship_length += 1
+                            ships[ship_length - 1] += 1
+                            break
+                        if i < 10 and board.board[i][col] not in ('m', 'M', 'b', 'B'):
+                            break
+                # Count Horizontal Ships
+                if board.board[row][col] in ('l', 'L'):
+                    ship_length = 1
+                    for i in range(col + 1, col + 4):
+                        if i < 10 and board.board[row][i] in ('m', 'M'):
+                            ship_length += 1
+                        if i < 10 and board.board[row][i] in ('r', 'R'):
+                            ship_length += 1
+                            ships[ship_length - 1] += 1
+                            break
+                        if i < 10 and board.board[row][i] not in ('m', 'M', 'r', 'R'):
+                            break
+        return ships
 
+    @staticmethod
+    def create_all_first_options(board: Board):
+        """Cria todas as opções iniciais possíveis."""
+        def matching_rows(row1, row2):
+            # add que se for tudo igual quero que de falso logo 
+            for i in range(10):
+                if row1[i].upper() == row2[i].upper() and row1[i].upper() == 'C':
+                    return False
+                if row1[i].upper() == row2[i].upper():
+                    continue
+                elif row1[i] == '' or row2[i] == '':
+                    continue
+                else:
+                    return False
+            return True
+
+        options = {1: [], 2: [], 3: [], 4: []}
+        # Horizontals 
+        for row in range(10):
+            if board.row_number[row] >= 4:
+                for i in range(7):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 'l'
+                    np_row[0][i+1:i+3] = 'm'
+                    np_row[0][i+3] = 'r'
+                    if matching_rows(board.board[row], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[row] = np_row
+                        obj = Board(np_matrix)
+                        options[4].append(obj)
+            if board.row_number[row] >= 3:
+                for i in range(8):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 'l'
+                    np_row[0][i+1:i+2] = 'm'
+                    np_row[0][i+2] = 'r'
+                    if matching_rows(board.board[row], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[row] = np_row
+                        obj = Board(np_matrix)
+                        options[3].append(obj)
+            if board.row_number[row] >= 2:
+                for i in range(9):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 'l'
+                    np_row[0][i+1] = 'r'
+                    if matching_rows(board.board[row], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[row] = np_row
+                        obj = Board(np_matrix)
+                        options[2].append(obj)
+            if board.row_number[row] >= 1:
+                for i in range(10):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 'c'
+                    if matching_rows(board.board[row], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[row] = np_row
+                        obj = Board(np_matrix)
+                        options[1].append(obj)
+        # Verticals
+        for col in range(10):
+            if board.col_number[col] >= 4:
+                for i in range(7):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 't'
+                    np_row[0][i+1:i+3] = 'm'
+                    np_row[0][i+3] = 'b'
+                    if matching_rows(board.board.transpose()[col], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[col] = np_row
+                        obj = Board(np_matrix.transpose())
+                        options[4].append(obj)
+            if board.col_number[col] >= 3:
+                for i in range(8):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 't'
+                    np_row[0][i+1:i+2] = 'm'
+                    np_row[0][i+2] = 'b'
+                    if matching_rows(board.board.transpose()[col], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[col] = np_row
+                        obj = Board(np_matrix.transpose())
+                        options[3].append(obj)
+            if board.col_number[col] >= 2:
+                for i in range(9):
+                    np_row = np.zeros((1, 10), dtype=str)
+                    np_row[0][i] = 't'
+                    np_row[0][i+1] = 'b'
+                    if matching_rows(board.board.transpose()[col], np_row[0]):
+                        np_matrix = np.zeros((10, 10), dtype=str)
+                        np_matrix[col] = np_row
+                        obj = Board(np_matrix.transpose())
+                        options[2].append(obj)
+            
+
+
+
+
+
+
+        for i in range(1, 5):
+            print(len(options[i]))
+            print('banana')
 
 
     # TODO: outros metodos da classe
@@ -262,24 +402,9 @@ class Bimaru(Problem):
 if __name__ == "__main__":
     # Ler a instância a partir do ficheiro 'i1.txt' (Figura 1): # $ python3 bimaru.py < i1.txt
     board = Board.parse_instance()
-    Bimaru.fill_water_rows_cols(board)
-    Bimaru.fill_water_around_ship(board)
-    #board.print()
-    print(board.board)
-    '''
-    # Imprimir valores adjacentes
-    print(board.adjacent_vertical_values(3, 3))
-    print(board.adjacent_horizontal_values(3, 3))
-    print(board.adjacent_vertical_values(1, 0))
-    print(board.adjacent_horizontal_values(1, 0))
     problem = Bimaru(board)
-    s0 = BimaruState(board)
-    test = np.zeros((10, 10), dtype=str)
-    test[0][1] = 'w'
-    test[0][2] = 'w'
-    s1 = problem.result(s0, test)
-    s1.print()
-    '''
+    Bimaru.create_all_first_options(problem.board)
+    
     # TODO:
     # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
