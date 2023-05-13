@@ -26,9 +26,13 @@ class BimaruState:
         self.board = board
         self.id = BimaruState.state_id
         BimaruState.state_id += 1
+        self.grids = [board]
 
     def __lt__(self, other):
         return self.id < other.id
+    
+    def print(self):
+        self.board.print()
 
     # TODO: outros metodos da classe
 
@@ -46,26 +50,48 @@ class Board:
 
     def get_value(self, row: int, col: int) -> str:
         """Devolve o valor na respetiva posição do tabuleiro."""
+        if self.board[row][col] == '':
+            return None
         return self.board[row][col]
 
     def adjacent_vertical_values(self, row: int, col: int) -> (str, str):
         """Devolve os valores imediatamente acima e abaixo,
         respectivamente."""
         if row == 0:
+            if self.board[row + 1][col] == '':
+                return None, None
             return None, self.board[row + 1][col]
         elif row == 9:
+            if self.board[row - 1][col] == '':
+                return None, None
             return self.board[row - 1][col], None
         else:
+            if self.board[row - 1][col] == '':
+                if self.board[row + 1][col] == '':
+                    return None, None
+                return None, self.board[row + 1][col]
+            elif self.board[row + 1][col] == '':
+                return self.board[row - 1][col], None
             return self.board[row - 1][col], self.board[row + 1][col]
 
     def adjacent_horizontal_values(self, row: int, col: int) -> (str, str):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         if col == 0:
+            if self.board[row][col + 1] == '':
+                return None, None
             return None, self.board[row][col + 1]
         elif col == 9:
+            if self.board[row][col - 1] == '':
+                return None, None
             return self.board[row][col - 1], None
         else:
+            if self.board[row][col - 1] == '':
+                if self.board[row][col + 1] == '':
+                    return None, None
+                return None, self.board[row][col + 1]
+            elif self.board[row][col + 1] == '':
+                return self.board[row][col - 1], None
             return self.board[row][col - 1], self.board[row][col + 1]
 
     def print(self):
@@ -79,16 +105,12 @@ class Board:
         e retorna uma instância da classe Board."""
         # Creates the np array
         board = np.zeros((10, 10), dtype=str)
-        print(board)
         # Read the first line of txt file
         line = sys.stdin.readline().split()
         col = np.array([int(x) for x in line[1:]])
         # Read the second line of txt file
         line = sys.stdin.readline().split()
         row = np.array([int(x) for x in line[1:]])
-
-
-
         # Number of Hints
         n_hints = int(sys.stdin.readline())
         # Read the hints
@@ -96,7 +118,6 @@ class Board:
             for _ in range(n_hints):
                 line = sys.stdin.readline().split()
                 board[int(line[1])][int(line[2])] = line[3]
-        # TODO
         return Board(board, col, row)
 
     # TODO: outros metodos da classe
@@ -105,6 +126,7 @@ class Board:
 class Bimaru(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
+        self.board = board
         # TODO
         pass
 
@@ -119,8 +141,13 @@ class Bimaru(Problem):
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de
         self.actions(state)."""
-        # TODO
-        pass
+        # Keep the action ? 
+        c = np.char.add(state.board.board, action)
+        board = Board(c, state.board.col_number, state.board.row_number)
+        d = BimaruState(board)
+        d.grids.append(action)
+        return d
+
 
     def goal_test(self, state: BimaruState):
         """Retorna True se e só se o estado passado como argumento é
@@ -138,8 +165,21 @@ class Bimaru(Problem):
 
 
 if __name__ == "__main__":
+    # Ler a instância a partir do ficheiro 'i1.txt' (Figura 1): # $ python3 bimaru.py < i1.txt
     board = Board.parse_instance()
     board.print()
+    # Imprimir valores adjacentes
+    print(board.adjacent_vertical_values(3, 3))
+    print(board.adjacent_horizontal_values(3, 3))
+    print(board.adjacent_vertical_values(1, 0))
+    print(board.adjacent_horizontal_values(1, 0))
+    problem = Bimaru(board)
+    s0 = BimaruState(board)
+    test = np.zeros((10, 10), dtype=str)
+    test[0][1] = 'w'
+    test[0][2] = 'w'
+    s1 = problem.result(s0, test)
+    s1.print()
     # TODO:
     # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
