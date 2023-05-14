@@ -113,8 +113,36 @@ class Board:
                 if board1.board[row][col].upper() != board2.board[row][col].upper():
                     if board1.board[row][col] != '' and board2.board[row][col] != '':
                         return False
+        matrix = np.zeros((10, 10))
+        for row in range(10):
+            for col in range(10):
+                if board1.board[row][col] not in ['', 'w', 'W']:
+                    matrix[row][col] = 1
+                if board2.board[row][col] not in ['', 'w', 'W']:
+                    matrix[row][col] = 1
+        col_compare = matrix.sum(axis=0)
+        row_compare = matrix.sum(axis=1)
+        
+        for i in range(10):
+            if int(col_compare[i]) > board1.col_number[i] or int(row_compare[i]) > board1.row_number[i]:
+                return False
+        # Other conditions
+        for row in range(10):
+            for col in range(10):
+                if board1.board[row][col] in ('t', 'T') and row + 2 < 9:
+                    if board2.board[row + 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 't', 'T'):
+                        return False
+                if board.board[row][col] in ('b', 'B') and row - 2 > 0:
+                    if board2.board[row - 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 'b', 'B'):
+                        return False
+                if board.board[row][col] in ('l', 'L') and col + 2 < 9:
+                    if board2.board[row][col + 2] in ('c', 'C', 't', 'T', 'B', 'b', 'l', 'L'):
+                        return False
+                if board.board[row][col] in ('r', 'R') and col - 2 > 0:
+                    if board2.board[row][col - 2] in ('c', 'C', 't', 'T', 'B', 'b', 'r', 'R'):
+                        return False
+
         return True
-        # Falta contar peças para ver se encaixa
     
 
     @staticmethod
