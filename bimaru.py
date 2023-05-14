@@ -105,17 +105,15 @@ class Board:
         for row in self.board:
             print(" ".join(row))
 
-    def match_boards(self, other):
-        """Verifica se dois tabuleiros encaixam."""
+    @staticmethod
+    def match_boards(board1, board2):
+        """Verifies if two boards match."""
         for row in range(10):
             for col in range(10):
-                if self.board[row][col].upper() == other.board[row][col].upper():
-                    continue
-                elif self.board[row][col] == '' or other.board[row][col] == '':
-                    continue
-                else:
-                    return False
-            return True
+                if board1.board[row][col].upper() != board2.board[row][col].upper():
+                    if board1.board[row][col] != '' and board2.board[row][col] != '':
+                        return False
+        return True
         # Falta contar peças para ver se encaixa
     
 
@@ -296,101 +294,51 @@ class Bimaru(Problem):
         def matching_rows(row1, row2):
             # add que se for tudo igual quero que de falso logo 
             for i in range(10):
-                if row1[i].upper() == row2[i].upper() and row1[i].upper() == 'C':
-                    return False
-                if row1[i].upper() == row2[i].upper():
-                    continue
-                elif row1[i] == '' or row2[i] == '':
-                    continue
-                else:
+                if row1[i].upper() != row2[i].upper():
+                    if row1[i] != '' and row2[i] != '':
+                        return False
+                elif row1[i].upper() == 'C':
                     return False
             return True
 
         options = {1: [], 2: [], 3: [], 4: []}
         # Horizontals 
         for row in range(10):
-            if board.row_number[row] >= 4:
-                for i in range(7):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 'l'
-                    np_row[0][i+1:i+3] = 'm'
-                    np_row[0][i+3] = 'r'
-                    if matching_rows(board.board[row], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[row] = np_row
-                        obj = Board(np_matrix)
-                        options[4].append(obj)
-            if board.row_number[row] >= 3:
-                for i in range(8):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 'l'
-                    np_row[0][i+1:i+2] = 'm'
-                    np_row[0][i+2] = 'r'
-                    if matching_rows(board.board[row], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[row] = np_row
-                        obj = Board(np_matrix)
-                        options[3].append(obj)
-            if board.row_number[row] >= 2:
-                for i in range(9):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 'l'
-                    np_row[0][i+1] = 'r'
-                    if matching_rows(board.board[row], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[row] = np_row
-                        obj = Board(np_matrix)
-                        options[2].append(obj)
-            if board.row_number[row] >= 1:
-                for i in range(10):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 'c'
-                    if matching_rows(board.board[row], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[row] = np_row
-                        obj = Board(np_matrix)
-                        options[1].append(obj)
+            for ship_length in range(1, 5):
+                if board.row_number[row] >= ship_length:
+                    for i in range(11 - ship_length):
+                        np_row = np.zeros((1, 10), dtype=str)
+                        if ship_length == 1:
+                            np_row[0][i] = 'c'
+                        else:
+                            np_row[0][i] = 'l'
+                            for k in range(1, ship_length - 1):
+                                np_row[0][i+k] = 'm'
+                            np_row[0][i+ship_length-1] = 'r'
+                        if matching_rows(board.board[row], np_row[0]):
+                            np_matrix = np.zeros((10, 10), dtype=str)
+                            np_matrix[row] = np_row[0]
+                            obj = Board(np_matrix)
+                            Bimaru.fill_water_around_ship(obj)
+                            if Board.match_boards(board, obj):
+                                options[ship_length].append(obj)
         # Verticals
         for col in range(10):
-            if board.col_number[col] >= 4:
-                for i in range(7):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 't'
-                    np_row[0][i+1:i+3] = 'm'
-                    np_row[0][i+3] = 'b'
-                    if matching_rows(board.board.transpose()[col], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[col] = np_row
-                        obj = Board(np_matrix.transpose())
-                        options[4].append(obj)
-            if board.col_number[col] >= 3:
-                for i in range(8):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 't'
-                    np_row[0][i+1:i+2] = 'm'
-                    np_row[0][i+2] = 'b'
-                    if matching_rows(board.board.transpose()[col], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[col] = np_row
-                        obj = Board(np_matrix.transpose())
-                        options[3].append(obj)
-            if board.col_number[col] >= 2:
-                for i in range(9):
-                    np_row = np.zeros((1, 10), dtype=str)
-                    np_row[0][i] = 't'
-                    np_row[0][i+1] = 'b'
-                    if matching_rows(board.board.transpose()[col], np_row[0]):
-                        np_matrix = np.zeros((10, 10), dtype=str)
-                        np_matrix[col] = np_row
-                        obj = Board(np_matrix.transpose())
-                        options[2].append(obj)
-            
-
-
-
-
-
-
+            for ship_length in range(2, 5):
+                if board.col_number[col] >= ship_length:
+                    for i in range(11 - ship_length):
+                        np_row = np.zeros((1, 10), dtype=str)
+                        np_row[0][i] = 't'
+                        for j in range(ship_length - 2):
+                            np_row[0][i+j+1] = 'm'
+                        np_row[0][i+ship_length-1] = 'b'
+                        if matching_rows(board.board.transpose()[col], np_row[0]):
+                            np_matrix = np.zeros((10, 10), dtype=str)
+                            np_matrix[col] = np_row[0]
+                            obj = Board(np_matrix.transpose())
+                            Bimaru.fill_water_around_ship(obj)
+                            if Board.match_boards(board, obj):
+                                options[ship_length].append(obj)
         for i in range(1, 5):
             print(len(options[i]))
             print('banana')
