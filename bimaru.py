@@ -6,7 +6,9 @@
 # 00000 Pedro M. P. Curvo
 # 00000 Nome2
 
+import itertools
 import sys
+import time
 import numpy as np
 from search import (
     Problem,
@@ -108,8 +110,9 @@ class Board:
 
     def print(self):
         """Imprime o tabuleiro."""
+        self.board = np.where(self.board == 'w', '.', self.board)
         for row in self.board:
-            print(" ".join(row))
+            print("".join(row))
 
     @staticmethod
     def match_boards(board1, board2):
@@ -135,21 +138,21 @@ class Board:
         # Other conditions
         for row in range(10):
             for col in range(10):
-                if board1.board[row][col] in ('t', 'T') and row + 2 < 9:
+                if board1.board[row][col] in {'t', 'T'} and row + 2 < 9:
                     if board2.board[row + 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 't', 'T'):
                         return False
-                if board.board[row][col] in ('b', 'B') and row - 2 > 0 and board2.board[row - 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 'b', 'B'):
+                if board.board[row][col] in {'b', 'B'} and row - 2 > 0 and board2.board[row - 2][col] in {'c', 'C', 'l', 'L', 'R', 'r', 'b', 'B'}:
                     return False
-                if board.board[row][col] in ('l', 'L') and col + 2 < 9:
+                if board.board[row][col] in {'l', 'L'} and col + 2 < 9:
                     if board2.board[row][col + 2] in ('c', 'C', 't', 'T', 'B', 'b', 'l', 'L'):
                         return False
-                if board.board[row][col] in ('r', 'R') and col - 2 > 0:
+                if board.board[row][col] in {'r', 'R'} and col - 2 > 0:
                     if board2.board[row][col - 2] in ('c', 'C', 't', 'T', 'B', 'b', 'r', 'R'):
                         return False
         aim = 0
         for row in range(10):
             for col in range(10):
-                if board2.board[row][col].upper() in ('C', 'T', 'B', 'L', 'R'):
+                if board2.board[row][col].upper() in {'C', 'T', 'B', 'L', 'R'}:
                     if board2.board[row][col].upper() != board1.board[row][col].upper():
                         aim += 1
         if aim == 0 : return False
@@ -201,30 +204,13 @@ class Bimaru(Problem):
             return self.first_options[4]
         if state.ships[2] != state.expectated_ships[2]:
             lista = [option for option in self.first_options[3] if Board.match_boards(state.board, option)]
-            '''for option in self.first_options[3]:
-                if Board.match_boards(state.board, option):
-                    lista.append(option)
-            '''
             return lista
         if state.ships[1] != state.expectated_ships[1]:
             lista = [option for option in self.first_options[2] if Board.match_boards(state.board, option)]
-            '''for option in self.first_options[2]:
-                if Board.match_boards(state.board, option):
-                    lista.append(option)
-            '''
             return lista
         if state.ships[0] != state.expectated_ships[0]:
             lista = [option for option in self.first_options[1] if Board.match_boards(state.board, option)]
-            #lista = []
-            '''
-            for option in self.first_options[1]:
-                if Board.match_boards(state.board, option):
-                    lista.append(option)
-            '''
             return lista
-        # add water to empty positions
-        # TODO
-        pass
 
     def result(self, state: BimaruState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -236,7 +222,6 @@ class Bimaru(Problem):
         Bimaru.fill_water(new_board)
         new_state = BimaruState(new_board)
         new_state.ships = [state.ships[i] + Bimaru.count_ships(action)[i] for i in range(4)]
-        #new_state.board.print()
         return new_state
 
 
@@ -247,12 +232,10 @@ class Bimaru(Problem):
         if state.ships != self.expected_ships:
             return False
         matrix = np.zeros((10, 10))
-        for row in range(10):
-            for col in range(10):
-                if state.board.board[row][col] not in ['', 'w', 'W']:
-                    matrix[row][col] = 1
-                if state.board.board[row][col] not in ['', 'w', 'W']:
-                    matrix[row][col] = 1
+        for row, col in itertools.product(range(10), range(10)):
+            if state.board.board[row][col] not in {'', 'w', 'W'}:
+                matrix[row][col] = 1
+                matrix[row][col] = 1
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
         for i in range(10):
@@ -260,7 +243,7 @@ class Bimaru(Problem):
                 return False
             if row_compare[i] != state.board.row_number[i]:
                 return False
-    
+
         # All checks passed, it's a solution!
         return True
 
@@ -370,7 +353,7 @@ class Bimaru(Problem):
         matrix = np.zeros((10, 10))
         for row in range(10):
             for col in range(10):
-                if board.board[row][col] not in ['', 'w', 'W']:
+                if board.board[row][col] not in {'', 'w', 'W'}:
                     matrix[row][col] = 1
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
@@ -433,9 +416,6 @@ class Bimaru(Problem):
                             Bimaru.fill_water_around_ship(obj)
                             if Board.match_boards(board, obj):
                                 options[ship_length].append(obj)
-        #for i in range(1, 5):
-        #    print(len(options[i]))
-        #    print('banana')
         return options
 
 
@@ -445,13 +425,18 @@ if __name__ == "__main__":
     # Ler a instância a partir do ficheiro 'i1.txt' (Figura 1): # $ python3 bimaru.py < i1.txt
     board = Board.parse_instance()
     problem = Bimaru(board)
+    start_time = time.time()
     goal_node = depth_first_tree_search(problem)
-    '''
+    end_time = time.time()
+
+
     print('Is goal?', problem.goal_test(goal_node.state))
     print('Path cost:', goal_node.path_cost)
     print('Solution: \n')
     goal_node.state.board.print()
-    '''
+    print('Time:', end_time - start_time)
+
+    
 
     '''
     initial_state = problem.initial
