@@ -200,22 +200,27 @@ class Bimaru(Problem):
         if state.ships[3] != state.expectated_ships[3]:
             return self.first_options[4]
         if state.ships[2] != state.expectated_ships[2]:
-            lista = []
-            for option in self.first_options[3]:
+            lista = [option for option in self.first_options[3] if Board.match_boards(state.board, option)]
+            '''for option in self.first_options[3]:
                 if Board.match_boards(state.board, option):
                     lista.append(option)
+            '''
             return lista
         if state.ships[1] != state.expectated_ships[1]:
-            lista = []
-            for option in self.first_options[2]:
+            lista = [option for option in self.first_options[2] if Board.match_boards(state.board, option)]
+            '''for option in self.first_options[2]:
                 if Board.match_boards(state.board, option):
                     lista.append(option)
+            '''
             return lista
         if state.ships[0] != state.expectated_ships[0]:
-            lista = []
+            lista = [option for option in self.first_options[1] if Board.match_boards(state.board, option)]
+            #lista = []
+            '''
             for option in self.first_options[1]:
                 if Board.match_boards(state.board, option):
                     lista.append(option)
+            '''
             return lista
         # add water to empty positions
         # TODO
@@ -441,10 +446,12 @@ if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
     goal_node = depth_first_tree_search(problem)
+    '''
     print('Is goal?', problem.goal_test(goal_node.state))
     print('Path cost:', goal_node.path_cost)
     print('Solution: \n')
     goal_node.state.board.print()
+    '''
 
     '''
     initial_state = problem.initial
