@@ -9,6 +9,8 @@
 import itertools
 import sys
 import time
+import tracemalloc
+import random
 import numpy as np
 from search import (
     Problem,
@@ -38,7 +40,7 @@ class BimaruState:
 
     def __lt__(self, other):
         return self.id < other.id
-    
+
     def print(self):
         self.board.print()
 
@@ -52,7 +54,7 @@ class Board:
         """Construtor da classe. Recebe um array bidimensional
         (matriz) numpy com o conteúdo do tabuleiro."""
         self.board = board
-        self.col_number = col_number 
+        self.col_number = col_number
         self.row_number = row_number
     
     def __add__(self, other):
@@ -122,6 +124,7 @@ class Board:
                 if board1.board[row][col].upper() != board2.board[row][col].upper():
                     if board1.board[row][col] != '' and board2.board[row][col] != '':
                         return False
+        
         matrix = np.zeros((10, 10))
         for row in range(10):
             for col in range(10):
@@ -129,6 +132,7 @@ class Board:
                     matrix[row][col] = 1
                 if board2.board[row][col] not in ['', 'w', 'W']:
                     matrix[row][col] = 1
+        
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
         
@@ -181,8 +185,6 @@ class Board:
                 board[int(line[1])][int(line[2])] = line[3]
         return Board(board, col, row)
 
-    # TODO: outros metodos da classe
-
 
 class Bimaru(Problem):
     def __init__(self, board: Board):
@@ -217,7 +219,6 @@ class Bimaru(Problem):
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de
         self.actions(state)."""
-        # Keep the action ? 
         new_board = state.board + action
         Bimaru.fill_water(new_board)
         new_state = BimaruState(new_board)
@@ -229,6 +230,7 @@ class Bimaru(Problem):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas de acordo com as regras do problema."""
+        #return state.ships == self.expected_ships
         if state.ships != self.expected_ships:
             return False
         matrix = np.zeros((10, 10))
@@ -244,11 +246,15 @@ class Bimaru(Problem):
             if row_compare[i] != state.board.row_number[i]:
                 return False
 
-        # All checks passed, it's a solution!
         return True
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
+        #print(type(self))
+        return random.randint(0, 20)
+        value = np.count_nonzero(node.state.board.board == '')
+        return 100 - value
+        print(value)
         # TODO
         pass
     
@@ -257,12 +263,17 @@ class Bimaru(Problem):
         """Preenche com água as linhas e colunas que não contêm barcos."""
         for row in range(10):
             if board.row_number[row] == 0:
+                board.board[row] = ['w' for _ in range(10)]
+                '''
                 for col in range(10):
                     board.board[row][col] = 'w'
+                '''
         for col in range(10):
             if board.col_number[col] == 0:
-                for row in range(10):
+                board.board[:, col] = ['w' for _ in range(10)]
+                '''for row in range(10):
                     board.board[row][col] = 'w'
+                '''
 
     @staticmethod
     def fill_water_around_ship(board: Board):
@@ -320,15 +331,15 @@ class Bimaru(Problem):
         for row in range(10):
             for col in range(10):
                 # Count Single Ships
-                if board.board[row][col] in ('c', 'C'):
+                if board.board[row][col] in {'c', 'C'}:
                     ships[0] += 1
                 # Count Vertical Ships
-                if board.board[row][col] in ('t', 'T'):
+                if board.board[row][col] in {'t', 'T'}:
                     ship_length = 1
                     for i in range(row + 1, row + 4):
-                        if i < 10 and board.board[i][col] in ('m', 'M'):
+                        if i < 10 and board.board[i][col] in {'m', 'M'}:
                             ship_length += 1
-                        if i < 10 and board.board[i][col] in ('b', 'B'):
+                        if i < 10 and board.board[i][col] in {'b', 'B'}:
                             ship_length += 1
                             ships[ship_length - 1] += 1
                             break
@@ -338,30 +349,33 @@ class Bimaru(Problem):
                 if board.board[row][col] in ('l', 'L'):
                     ship_length = 1
                     for i in range(col + 1, col + 4):
-                        if i < 10 and board.board[row][i] in ('m', 'M'):
+                        if i < 10 and board.board[row][i] in {'m', 'M'}:
                             ship_length += 1
-                        if i < 10 and board.board[row][i] in ('r', 'R'):
+                        if i < 10 and board.board[row][i] in {'r', 'R'}:
                             ship_length += 1
                             ships[ship_length - 1] += 1
                             break
-                        if i < 10 and board.board[row][i] not in ('m', 'M', 'r', 'R'):
+                        if i < 10 and board.board[row][i] not in {'m', 'M', 'r', 'R'}:
                             break
         return ships
 
     @staticmethod
     def fill_water(board: Board):
+        '''
         matrix = np.zeros((10, 10))
         for row in range(10):
             for col in range(10):
                 if board.board[row][col] not in {'', 'w', 'W'}:
                     matrix[row][col] = 1
+        '''
+        valid_values = ['', 'w', 'W']
+        matrix = np.where(np.isin(board.board, valid_values), 0, 1)
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
         for row in range(10):
             for col in range(10):
-                if board.board[row][col] == '':
-                    if col_compare[col] == board.col_number[col] or row_compare[row] == board.row_number[row]:
-                        board.board[row][col] = 'w'
+                if board.board[row][col] == '' and (col_compare[col] == board.col_number[col] or row_compare[row] == board.row_number[row]):
+                    board.board[row][col] = 'w'
 
 
 
@@ -423,21 +437,22 @@ class Bimaru(Problem):
 
 if __name__ == "__main__":
     # Ler a instância a partir do ficheiro 'i1.txt' (Figura 1): # $ python3 bimaru.py < i1.txt
+    start_time = time.time()
     board = Board.parse_instance()
     problem = Bimaru(board)
-    start_time = time.time()
-    goal_node = depth_first_tree_search(problem)
     end_time = time.time()
+    #goal_node = depth_first_tree_search(problem)
+    goal_node = astar_search(problem)
+    #print(problem.h(goal_node.state))
 
-
+    '''
     print('Is goal?', problem.goal_test(goal_node.state))
     print('Path cost:', goal_node.path_cost)
     print('Solution: \n')
     goal_node.state.board.print()
+    '''
+
     print('Time:', end_time - start_time)
-
-    
-
     '''
     initial_state = problem.initial
     print(initial_state.ships)
