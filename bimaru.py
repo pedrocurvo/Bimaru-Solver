@@ -2,7 +2,7 @@
 # Devem alterar as classes e funções neste ficheiro de acordo com as instruções do enunciado.
 # Além das funções e classes já definidas, podem acrescentar outras que considerem pertinentes.
 
-# Grupo 00:
+# Grupo 102:
 # 00000 Pedro M. P. Curvo
 # 00000 Nome2
 
@@ -437,13 +437,14 @@ class Bimaru(Problem):
 
 if __name__ == "__main__":
     # Ler a instância a partir do ficheiro 'i1.txt' (Figura 1): # $ python3 bimaru.py < i1.txt
-    start_time = time.time()
+    #start_time = time.time()
     board = Board.parse_instance()
     problem = Bimaru(board)
-    end_time = time.time()
-    #goal_node = depth_first_tree_search(problem)
-    goal_node = astar_search(problem)
+    #end_time = time.time()
+    goal_node = depth_first_tree_search(problem)
+    #goal_node = astar_search(problem)
     #print(problem.h(goal_node.state))
+    #goal_node.state.board.print()
 
     '''
     print('Is goal?', problem.goal_test(goal_node.state))
@@ -452,7 +453,7 @@ if __name__ == "__main__":
     goal_node.state.board.print()
     '''
 
-    print('Time:', end_time - start_time)
+    #print('Time:', end_time - start_time)
     '''
     initial_state = problem.initial
     print(initial_state.ships)
