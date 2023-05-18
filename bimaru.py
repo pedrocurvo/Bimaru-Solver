@@ -44,7 +44,6 @@ class BimaruState:
     def print(self):
         self.board.print()
 
-    # TODO: outros metodos da classe
 
 
 class Board:
@@ -245,12 +244,7 @@ class Bimaru(Problem):
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
         #print(type(self))
-        return random.randint(0, 20)
-        value = np.count_nonzero(node.state.board.board == '')
-        return 100 - value
-        print(value)
-        # TODO
-        pass
+        return random.randint(0, 9)
     
     @staticmethod
     def fill_water_rows_cols(board: Board):
@@ -434,33 +428,11 @@ if __name__ == "__main__":
     #print(problem.h(goal_node.state))
     #goal_node.state.board.print()
 
-    '''
+    
     print('Is goal?', problem.goal_test(goal_node.state))
-    print('Path cost:', goal_node.path_cost)
+    print('Path cost:', goal_node.state.state_id)
     print('Solution: \n')
     goal_node.state.board.print()
-    '''
+
 
     #print('Time:', end_time - start_time)
-    '''
-    initial_state = problem.initial
-    print(initial_state.ships)
-    s2 = problem.result(initial_state, problem.actions(initial_state)[2])
-    print(s2.ships)
-    s3 = problem.result(s2, problem.actions(s2)[2])
-    s3.board.print()
-    print(s3.ships)
-    problem.actions(s3)[0].print()
-    s4 = problem.result(s3, problem.actions(s3)[0])
-    s4.board.print()
-    print(s4.ships)
-    print(Bimaru.count_ships(s4.board))
-    '''
-    #Bimaru.create_all_first_options(problem.board)
-    
-    # TODO:
-    # Ler o ficheiro do standard input,
-    # Usar uma técnica de procura para resolver a instância,
-    # Retirar a solução a partir do nó resultante,
-    # Imprimir para o standard output no formato indicado.
-    pass
