@@ -59,7 +59,6 @@ class Board:
     
     def __add__(self, other):
         """Soma de dois tabuleiros."""
-        """Soma de dois tabuleiros."""
         new_board = np.where(self.board == '', other.board, self.board)
         return Board(new_board, self.col_number, self.row_number)
 
@@ -121,10 +120,9 @@ class Board:
         """Verifies if two boards match."""
         for row in range(10):
             for col in range(10):
-                if board1.board[row][col].upper() != board2.board[row][col].upper():
-                    if board1.board[row][col] != '' and board2.board[row][col] != '':
-                        return False
-        
+                if board1.board[row][col].upper() != board2.board[row][col].upper() and (board1.board[row][col] != '' and board2.board[row][col] != ''):
+                    return False
+        #Built in this 
         matrix = np.zeros((10, 10))
         for row in range(10):
             for col in range(10):
@@ -137,28 +135,24 @@ class Board:
         row_compare = matrix.sum(axis=1)
         
         for i in range(10):
-            if int(col_compare[i]) > board1.col_number[i] or int(row_compare[i]) > board1.row_number[i]:
+            if col_compare[i] > board1.col_number[i] or row_compare[i] > board1.row_number[i]:
                 return False
         # Other conditions
         for row in range(10):
             for col in range(10):
-                if board1.board[row][col] in {'t', 'T'} and row + 2 < 9:
-                    if board2.board[row + 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 't', 'T'):
-                        return False
+                if board1.board[row][col] in {'t', 'T'} and row + 2 < 9 and board2.board[row + 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 't', 'T'):
+                    return False
                 if board.board[row][col] in {'b', 'B'} and row - 2 > 0 and board2.board[row - 2][col] in {'c', 'C', 'l', 'L', 'R', 'r', 'b', 'B'}:
                     return False
-                if board.board[row][col] in {'l', 'L'} and col + 2 < 9:
-                    if board2.board[row][col + 2] in ('c', 'C', 't', 'T', 'B', 'b', 'l', 'L'):
-                        return False
-                if board.board[row][col] in {'r', 'R'} and col - 2 > 0:
-                    if board2.board[row][col - 2] in ('c', 'C', 't', 'T', 'B', 'b', 'r', 'R'):
-                        return False
+                if board.board[row][col] in {'l', 'L'} and col + 2 < 9 and board2.board[row][col + 2] in ('c', 'C', 't', 'T', 'B', 'b', 'l', 'L'):
+                    return False
+                if board.board[row][col] in {'r', 'R'} and col - 2 > 0 and board2.board[row][col - 2] in ('c', 'C', 't', 'T', 'B', 'b', 'r', 'R'):
+                    return False
         aim = 0
         for row in range(10):
             for col in range(10):
-                if board2.board[row][col].upper() in {'C', 'T', 'B', 'L', 'R'}:
-                    if board2.board[row][col].upper() != board1.board[row][col].upper():
-                        aim += 1
+                if board2.board[row][col].upper() in {'C', 'T', 'B', 'L', 'R'} and board2.board[row][col].upper() != board1.board[row][col].upper():
+                    aim += 1
         if aim == 0 : return False
 
         return True
@@ -264,16 +258,9 @@ class Bimaru(Problem):
         for row in range(10):
             if board.row_number[row] == 0:
                 board.board[row] = ['w' for _ in range(10)]
-                '''
-                for col in range(10):
-                    board.board[row][col] = 'w'
-                '''
         for col in range(10):
             if board.col_number[col] == 0:
                 board.board[:, col] = ['w' for _ in range(10)]
-                '''for row in range(10):
-                    board.board[row][col] = 'w'
-                '''
 
     @staticmethod
     def fill_water_around_ship(board: Board):
@@ -284,45 +271,46 @@ class Bimaru(Problem):
                 if board.board[row][col] in ('c', 'C'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10:
-                                if board.board[i][j] not in ('c', 'C'):
-                                    board.board[i][j] = 'w'
+                            if i >= 0 and i < 10 and j >= 0 and j < 10 and board.board[i][j] not in ('c', 'C'):
+                                board.board[i][j] = 'w'
                 # Fill around M
                 if board.board[row][col] in ('m', 'M'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10:
-                                if board.board[i][j] not in ('c', 'C') and j != col and i != row:
-                                    board.board[i][j] = 'w'
+                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('c', 'C') and j != col and i != row):
+                                board.board[i][j] = 'w'
+                    '''
+                    Terminal M               
+                    if row == 9: board.board[row - 1][col] = 'w'
+                    if row == 0: board.board[row + 1][col] = 'w'
+                    if col == 9: board.board[row][col - 1] = 'w'
+                    if col == 0: board.board[row][col + 1] = 'w'
+                    '''
 
                 # Fill around B
                 if board.board[row][col] in ('b', 'B'):
                     for i in range(row - 2, row + 2):
                         for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10:
-                                if board.board[i][j] not in ('b', 'B') and j != col or i > row:
-                                    board.board[i][j] = 'w'
+                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('b', 'B') and j != col or i > row):
+                                board.board[i][j] = 'w'
                 # Fill around T
                 if board.board[row][col] in ('t', 'T'):
                     for i in range(row - 1, row + 3):
                         for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10:
-                                if board.board[i][j] not in ('t', 'T') and j != col or i < row:
-                                    board.board[i][j] = 'w'
+                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('t', 'T') and j != col or i < row):
+                                board.board[i][j] = 'w'
                 # Fill around L
                 if board.board[row][col] in ('l', 'L'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 1, col + 3):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10:
-                                if board.board[i][j] not in ('l', 'L') and i != row or j < col:
-                                    board.board[i][j] = 'w'
+                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('l', 'L') and i != row or j < col):
+                                board.board[i][j] = 'w'
                 # Fill around R
                 if board.board[row][col] in ('r', 'R'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 2, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10:
-                                if board.board[i][j] not in ('r', 'R') and i != row or j > col:
-                                    board.board[i][j] = 'w'
+                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('r', 'R') and i != row or j > col):
+                                board.board[i][j] = 'w'
                     
     @staticmethod
     def count_ships(board: Board):
