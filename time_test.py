@@ -1,7 +1,7 @@
 import time
 import os
 media = []
-for i in range(14, 15):
+for i in range(1, 15):
     if i == 10: continue
     start_time = time.time()
     os.system(f'python3 bimaru.py < Instances/instance{i:02d}.txt')

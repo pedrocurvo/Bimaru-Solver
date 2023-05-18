@@ -64,9 +64,7 @@ class Board:
 
     def get_value(self, row: int, col: int) -> str:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        if self.board[row][col] == '':
-            return None
-        return self.board[row][col]
+        return None if self.board[row][col] == '' else self.board[row][col]
 
     def adjacent_vertical_values(self, row: int, col: int) -> (str, str):
         """Devolve os valores imediatamente acima e abaixo,
@@ -187,7 +185,7 @@ class Bimaru(Problem):
         Bimaru.fill_water_around_ship(board)
         Bimaru.fill_water(board)
         self.board = board
-        self.expected_ships = [4, 3, 2, 1]
+        self.expected_ships = [4, 3, 2, 1] # change to Bimaru expected ships
         self.ships = Bimaru.count_ships(board)
         self.first_options = Bimaru.create_all_first_options(board)
 
@@ -273,13 +271,13 @@ class Bimaru(Problem):
                         for j in range(col - 1, col + 2):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('c', 'C') and j != col and i != row):
                                 board.board[i][j] = 'w'
-                    '''
-                    Terminal M               
+                    
+                    # Terminal M               
                     if row == 9: board.board[row - 1][col] = 'w'
                     if row == 0: board.board[row + 1][col] = 'w'
                     if col == 9: board.board[row][col - 1] = 'w'
                     if col == 0: board.board[row][col + 1] = 'w'
-                    '''
+                    
 
                 # Fill around B
                 if board.board[row][col] in ('b', 'B'):
@@ -343,13 +341,6 @@ class Bimaru(Problem):
 
     @staticmethod
     def fill_water(board: Board):
-        '''
-        matrix = np.zeros((10, 10))
-        for row in range(10):
-            for col in range(10):
-                if board.board[row][col] not in {'', 'w', 'W'}:
-                    matrix[row][col] = 1
-        '''
         valid_values = ['', 'w', 'W']
         matrix = np.where(np.isin(board.board, valid_values), 0, 1)
         col_compare = matrix.sum(axis=0)
@@ -364,8 +355,7 @@ class Bimaru(Problem):
     @staticmethod
     def create_all_first_options(board: Board):
         """Cria todas as opções iniciais possíveis."""
-        def matching_rows(row1, row2):
-            # add que se for tudo igual quero que de falso logo 
+        def matching_rows(row1, row2): 
             for i in range(10):
                 if row1[i].upper() != row2[i].upper():
                     if row1[i] != '' and row2[i] != '':
@@ -418,21 +408,7 @@ class Bimaru(Problem):
 
 
 if __name__ == "__main__":
-    # Ler a instância a partir do ficheiro 'i1.txt' (Figura 1): # $ python3 bimaru.py < i1.txt
-    #start_time = time.time()
     board = Board.parse_instance()
     problem = Bimaru(board)
-    #end_time = time.time()
     goal_node = depth_first_tree_search(problem)
-    #goal_node = astar_search(problem)
-    #print(problem.h(goal_node.state))
-    #goal_node.state.board.print()
-
-    
-    print('Is goal?', problem.goal_test(goal_node.state))
-    print('Path cost:', goal_node.state.state_id)
-    print('Solution: \n')
-    goal_node.state.board.print()
-
-
-    #print('Time:', end_time - start_time)
+    goal_node.state.print()
