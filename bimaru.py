@@ -247,12 +247,20 @@ class Bimaru(Problem):
     @staticmethod
     def fill_water_rows_cols(board: Board):
         """Preenche com água as linhas e colunas que não contêm barcos."""
+        for coordinate in range(10):
+            if board.row_number[coordinate] == 0:
+                board.board[coordinate] = ['w' for _ in range(10)]
+            if board.col_number[coordinate] == 0:
+                board.board[:, coordinate] = ['w' for _ in range(10)]
+
+    '''
         for row in range(10):
             if board.row_number[row] == 0:
                 board.board[row] = ['w' for _ in range(10)]
         for col in range(10):
             if board.col_number[col] == 0:
                 board.board[:, col] = ['w' for _ in range(10)]
+    '''
 
     @staticmethod
     def fill_water_around_ship(board: Board):
