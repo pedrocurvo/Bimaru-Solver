@@ -117,12 +117,9 @@ class Board:
     @staticmethod
     def match_boards(board1, board2):
         """Verifies if two boards match."""
-        start_time = time.time()
-        Board.testify += time.time() - start_time
         for row in range(10):
             for col in range(10):
                 if board1.board[row][col].lower() != board2.board[row][col] and (board1.board[row][col] != '' and board2.board[row][col] != ''):
-                    Board.testify += time.time() - start_time
                     return False
         #Built in this 
         matrix = np.zeros((10, 10))
@@ -137,15 +134,39 @@ class Board:
                 if board2.board[row][col] not in ['', 'w', 'W']:
                     matrix[row][col] = 1
         '''
-        
+
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
-        
+
         for i in range(10):
             if col_compare[i] > board1.col_number[i] or row_compare[i] > board1.row_number[i]:
-                Board.testify += time.time() - start_time
                 return False
         # Other conditions
+        coordinate_t = np.argwhere(board1.board == 't')
+        coordinate_T = np.argwhere(board1.board == 'T')
+        coordinate_b = np.argwhere(board1.board == 'b')
+        coordinate_B = np.argwhere(board1.board == 'B')
+        coordinate_l = np.argwhere(board1.board == 'l')
+        coordinate_L = np.argwhere(board1.board == 'L')
+        coordinate_r = np.argwhere(board1.board == 'r')
+        coordinate_R = np.argwhere(board1.board == 'R')
+        for i in range(len(coordinate_t)):
+            if coordinate_t[i][0] < 7 and board2.board[coordinate_t[i][0] + 2][coordinate_t[i][1]] in ('c', 'l', 'r', 't'):
+                return False
+        for i in range(len(coordinate_b)):
+            if coordinate_b[i][0] > 2 and board2.board[coordinate_b[i][0] - 2][coordinate_b[i][1]] in ('c', 'l', 'r', 'b'):
+                return False
+        for i in range(len(coordinate_l)):
+            if coordinate_l[i][1] < 7 and board2.board[coordinate_l[i][0]][coordinate_l[i][1] + 2] in ('c', 't', 'b', 'l'):
+                return False
+        for i in range(len(coordinate_r)):
+            if coordinate_r[i][1] > 2 and board2.board[coordinate_r[i][0]][coordinate_r[i][1] - 2] in ('c', 't', 'b', 'r'):
+                return False
+        for i in range(len(coordinate_T)):
+            if coordinate_T[i][0] < 7 and board2.board[coordinate_T[i][0] + 2][coordinate_T[i][1]] in ('c', 'l', 'r', 't'):
+                return False
+
+        '''
         for row in range(10):
             for col in range(10):
                 if board1.board[row][col] in {'t', 'T'} and row + 2 < 9 and board2.board[row + 2][col] in ('c', 'l', 'r', 't'):
@@ -160,6 +181,7 @@ class Board:
                 if board1.board[row][col] in {'r', 'R'} and col - 2 > 0 and board2.board[row][col - 2] in ('c', 't', 'b', 'r'):
                     Board.testify += time.time() - start_time
                     return False
+        '''
         aim = 0
         for row in range(10):
             for col in range(10):
