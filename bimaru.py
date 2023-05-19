@@ -67,7 +67,7 @@ class Board:
         """Devolve o valor na respetiva posição do tabuleiro."""
         return None if self.board[row][col] == 0 else self.board[row][col]
 
-    def adjacent_vertical_values(self, row: int, col: int) -> (str, str):
+    def adjacent_vertical_values(self, row: int, col: int):
         """Devolve os valores imediatamente acima e abaixo,
         respectivamente."""
         if row == 0:
@@ -93,7 +93,7 @@ class Board:
                 return self.board[row - 1][col], None
             return self.board[row - 1][col], self.board[row + 1][col]
 
-    def adjacent_horizontal_values(self, row: int, col: int) -> (str, str):
+    def adjacent_horizontal_values(self, row: int, col: int):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         if col == 0:
@@ -409,7 +409,7 @@ class Bimaru(Problem):
             row = coordinate[0]
             col = coordinate[1]
             for i, j in itertools.product(range(row - 1, row + 2), range(col - 1, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10  and j != col and i != row: #board.board[i][j] != 64:
+                if i >= 0 and i < 10 and j >= 0 and j < 10  and j != col and i != row:
                     board.board[i][j] = 1 #w
 
             # Terminal M
@@ -504,6 +504,33 @@ class Bimaru(Problem):
         # Count Single Ships
         c_coords = np.argwhere(board.board == 64) #C
         ships[0] += len(c_coords)
+        # Count Vertical Ships
+        t_coords = np.argwhere(board.board == 2) #T
+        for coordinate in t_coords:
+            row, col = coordinate[0], coordinate[1]
+            ship_length = 1
+            for i in range(row + 1, row + 4):
+                if i < 10 and board.board[i][col] == 32: #M
+                    ship_length += 1
+                elif i < 10 and board.board[i][col] == 4: #B
+                    ship_length += 1
+                    ships[ship_length - 1] += 1
+                    break
+                else: break
+        # Count Horizontal Ships
+        l_coords = np.argwhere(board.board == 8) #l
+        for coordinate in l_coords:
+            row, col = coordinate[0], coordinate[1]
+            ship_length = 1
+            for i in range(col + 1, col + 4):
+                if i < 10 and board.board[row][i] == 32: #M
+                    ship_length += 1
+                elif i < 10 and board.board[row][i] == 16: #R
+                    ship_length += 1
+                    ships[ship_length - 1] += 1
+                    break
+                else: break
+        return ships
 
         for row in range(10):
             for col in range(10):

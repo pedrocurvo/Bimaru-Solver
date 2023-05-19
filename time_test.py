@@ -7,7 +7,7 @@ for i in range(1, 11):
     os.system(f'python3 bimaru.py < Instances/instance{i:02d}.txt')
     end_time = time.time()
     print(f'----- Instance {i} -----')
-    print("--- %s seconds ---" % (end_time - start_time))
+    print(f"--- {end_time - start_time} seconds ---")
     media.append(end_time - start_time)
 
 print(f'Media: {sum(media)/len(media)}')
