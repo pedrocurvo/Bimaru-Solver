@@ -71,18 +71,24 @@ class Board:
         """Devolve os valores imediatamente acima e abaixo,
         respectivamente."""
         if row == 0:
-            if self.board[row + 1][col] == '':
-                return None, None
-            return None, self.board[row + 1][col]
+            return (
+                (None, None)
+                if self.board[row + 1][col] == ''
+                else (None, self.board[row + 1][col])
+            )
         elif row == 9:
-            if self.board[row - 1][col] == '':
-                return None, None
-            return self.board[row - 1][col], None
+            return (
+                (None, None)
+                if self.board[row - 1][col] == ''
+                else (self.board[row - 1][col], None)
+            )
         else:
             if self.board[row - 1][col] == '':
-                if self.board[row + 1][col] == '':
-                    return None, None
-                return None, self.board[row + 1][col]
+                return (
+                    (None, None)
+                    if self.board[row + 1][col] == ''
+                    else (None, self.board[row + 1][col])
+                )
             elif self.board[row + 1][col] == '':
                 return self.board[row - 1][col], None
             return self.board[row - 1][col], self.board[row + 1][col]
@@ -91,18 +97,24 @@ class Board:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         if col == 0:
-            if self.board[row][col + 1] == '':
-                return None, None
-            return None, self.board[row][col + 1]
+            return (
+                (None, None)
+                if self.board[row][col + 1] == ''
+                else (None, self.board[row][col + 1])
+            )
         elif col == 9:
-            if self.board[row][col - 1] == '':
-                return None, None
-            return self.board[row][col - 1], None
+            return (
+                (None, None)
+                if self.board[row][col - 1] == ''
+                else (self.board[row][col - 1], None)
+            )
         else:
             if self.board[row][col - 1] == '':
-                if self.board[row][col + 1] == '':
-                    return None, None
-                return None, self.board[row][col + 1]
+                return (
+                    (None, None)
+                    if self.board[row][col + 1] == ''
+                    else (None, self.board[row][col + 1])
+                )
             elif self.board[row][col + 1] == '':
                 return self.board[row][col - 1], None
             return self.board[row][col - 1], self.board[row][col + 1]
