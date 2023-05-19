@@ -9,7 +9,6 @@
 import itertools
 import sys
 import time
-import tracemalloc
 import random
 import numpy as np
 from search import (
@@ -121,7 +120,6 @@ class Board:
             for col in range(10):
                 if board1.board[row][col].lower() != board2.board[row][col] and (board1.board[row][col] != '' and board2.board[row][col] != ''):
                     return False
-        #Built in this 
         matrix = np.zeros((10, 10))
         matrix = np.where((board1.board != '') & (board1.board != 'w') & (board1.board != 'W'), 1, 0)
         matrix = np.where((board2.board != '') & (board2.board != 'w'), 1, matrix)
@@ -141,6 +139,13 @@ class Board:
         for i in range(10):
             if col_compare[i] > board1.col_number[i] or row_compare[i] > board1.row_number[i]:
                 return False
+            
+        aim = 0
+        for row in range(10):
+            for col in range(10):
+                if board2.board[row][col] in {'c', 't', 'b', 'l', 'r'} and board2.board[row][col] != board1.board[row][col].lower():
+                    aim += 1
+        if aim == 0 : return False  
         # Other conditions
         coordinate_t = np.argwhere(board1.board == 't')
         coordinate_T = np.argwhere(board1.board == 'T')
@@ -151,8 +156,11 @@ class Board:
         coordinate_r = np.argwhere(board1.board == 'r')
         coordinate_R = np.argwhere(board1.board == 'R')
         for i in range(len(coordinate_t)):
+            if coordinate_t[i][0] < 7 and board2.board[coordinate_t[i][0] + 1][coordinate_t[i][1]] == 'w': return False
+            '''
             if coordinate_t[i][0] < 7 and board2.board[coordinate_t[i][0] + 2][coordinate_t[i][1]] in ('c', 'l', 'r', 't'):
                 return False
+            '''
         for i in range(len(coordinate_b)):
             if coordinate_b[i][0] > 2 and board2.board[coordinate_b[i][0] - 2][coordinate_b[i][1]] in ('c', 'l', 'r', 'b'):
                 return False
@@ -182,12 +190,6 @@ class Board:
                     Board.testify += time.time() - start_time
                     return False
         '''
-        aim = 0
-        for row in range(10):
-            for col in range(10):
-                if board2.board[row][col] in {'c', 't', 'b', 'l', 'r'} and board2.board[row][col] != board1.board[row][col].lower():
-                    aim += 1
-        if aim == 0 : return False
         #Board.testify += time.time() - start_time
         #print("Testify: ", Board.testify)
         return True
@@ -223,7 +225,7 @@ class Bimaru(Problem):
         Bimaru.fill_water(board)
         self.initial = BimaruState(board)
         #self.board = board
-        self.expected_ships = [4, 3, 2, 1] # change to Bimaru expected ships
+        self.expected_ships = np.array([4, 3, 2, 1])
         self.ships = Bimaru.count_ships(board)
         self.first_options = Bimaru.create_all_first_options(board)
 
@@ -265,7 +267,7 @@ class Bimaru(Problem):
                 coordinate = np.argwhere(option.board == 'c')[0]
                 if state.board.board[coordinate[0]][coordinate[1]] == '':
                     options.append(option)
-
+            #np.random.shuffle(options)
             return [
                 option
                 for option in options
@@ -314,6 +316,18 @@ class Bimaru(Problem):
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
+
+        #print(self.expected_ships.sum(axis=0))
+        #print(self.expected_ships)
+        return random.gauss(1, 10 - self.expected_ships.sum(axis=0) + 1)
+        if node.state.ships[3] != self.expected_ships[3]:
+            return 10
+        if node.state.ships[2] != self.expected_ships[2]:
+            return 9 - node.state.ships[2]
+        if node.state.ships[1] != self.expected_ships[1]:
+            return 8 - node.state.ships[1]
+        if node.state.ships[0] != self.expected_ships[0]:
+            return 7 - node.state.ships[0]
         return random.randint(1, 5)
         matrix = np.zeros((10, 10))
         np.where(matrix, node.state.board.board != '', 1)
@@ -357,7 +371,7 @@ class Bimaru(Problem):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and board.board[i][j] not in ('c', 'C'):
                                 board.board[i][j] = 'w'
                 # Fill around M
-                if board.board[row][col] in ('m', 'M'):
+                elif board.board[row][col] in ('m', 'M'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 1, col + 2):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('c', 'C') and j != col and i != row):
@@ -365,31 +379,31 @@ class Bimaru(Problem):
                     
                     # Terminal M               
                     if row == 9: board.board[row - 1][col] = 'w'
-                    if row == 0: board.board[row + 1][col] = 'w'
+                    elif row == 0: board.board[row + 1][col] = 'w'
                     if col == 9: board.board[row][col - 1] = 'w'
-                    if col == 0: board.board[row][col + 1] = 'w'
+                    elif col == 0: board.board[row][col + 1] = 'w'
                     
 
                 # Fill around B
-                if board.board[row][col] in ('b', 'B'):
+                elif board.board[row][col] in ('b', 'B'):
                     for i in range(row - 2, row + 2):
                         for j in range(col - 1, col + 2):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('b', 'B') and j != col or i > row):
                                 board.board[i][j] = 'w'
                 # Fill around T
-                if board.board[row][col] in ('t', 'T'):
+                elif board.board[row][col] in ('t', 'T'):
                     for i in range(row - 1, row + 3):
                         for j in range(col - 1, col + 2):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('t', 'T') and j != col or i < row):
                                 board.board[i][j] = 'w'
                 # Fill around L
-                if board.board[row][col] in ('l', 'L'):
+                elif board.board[row][col] in ('l', 'L'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 1, col + 3):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('l', 'L') and i != row or j < col):
                                 board.board[i][j] = 'w'
                 # Fill around R
-                if board.board[row][col] in ('r', 'R'):
+                elif board.board[row][col] in ('r', 'R'):
                     for i in range(row - 1, row + 2):
                         for j in range(col - 2, col + 2):
                             if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] not in ('r', 'R') and i != row or j > col):
@@ -478,6 +492,7 @@ class Bimaru(Problem):
                             Bimaru.fill_water_around_ship(obj)
                             if Board.match_boards(board, obj):
                                 options[ship_length].append(obj)
+                #random.shuffle(options[ship_length])
         # Verticals
         for col in range(10):
             for ship_length in range(2, 5):
@@ -496,6 +511,8 @@ class Bimaru(Problem):
                             Bimaru.fill_water_around_ship(obj)
                             if Board.match_boards(board, obj):
                                 options[ship_length].append(obj)
+            #for ship_length in range(2, 5):
+                #np.random.shuffle(options[ship_length])
         return options
 
 
@@ -505,5 +522,6 @@ if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
     goal_node = depth_first_tree_search(problem)
+    #goal_node = recursive_best_first_search(problem)
     #goal_node = astar_search(problem)
     goal_node.state.print()
