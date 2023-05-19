@@ -259,7 +259,7 @@ class Bimaru(Problem):
         Bimaru.fill_water(board)
         self.initial = BimaruState(board)
         self.expected_ships = np.array([4, 3, 2, 1])
-        self.ships = Bimaru.count_ships(board)
+        #self.ships = Bimaru.count_ships(board)
         self.first_options = Bimaru.create_all_first_options(board)
 
     
@@ -274,12 +274,33 @@ class Bimaru(Problem):
                 for option in self.first_options[3]
                 if Board.match_boards(state.board, option)
             ]
+        
         if state.ships[1] != self.expected_ships[1]:
             return [
                 option
                 for option in self.first_options[2]
                 if Board.match_boards(state.board, option)
             ]
+        
+        '''
+        if state.ships[1] != self.expected_ships[1]:
+            options = []
+            for option in self.first_options[2]:
+                coordinate_t = np.argwhere(option.board == 2) # t
+                coordinate_b = np.argwhere(option.board == 8) # l
+
+                if coordinate_t.size > 0 and (state.board.board[coordinate_t[0][0]][coordinate_t[0][1]] == 0 or state.board.board[coordinate_t[0][0] + 1][coordinate_t[0][1]] == 0):
+                    options.append(option)
+                elif coordinate_b.size > 0 and (state.board.board[coordinate_b[0][0]][coordinate_b[0][1]] == 0 or state.board.board[coordinate_b[0][0]][coordinate_b[0][1] + 1] == 0):
+                    options.append(option)
+            #np.random.shuffle(options)
+            return [
+                option
+                for option in options
+                if Board.match_boards(state.board, option)
+            ]
+        '''
+
         if state.ships[0] != self.expected_ships[0]:
             options = []
             for option in self.first_options[1]:
@@ -388,7 +409,7 @@ class Bimaru(Problem):
             row = coordinate[0]
             col = coordinate[1]
             for i, j in itertools.product(range(row - 1, row + 2), range(col - 1, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 64 and j != col and i != row):
+                if i >= 0 and i < 10 and j >= 0 and j < 10  and j != col and i != row: #board.board[i][j] != 64:
                     board.board[i][j] = 1 #w
 
             # Terminal M
@@ -483,6 +504,7 @@ class Bimaru(Problem):
         # Count Single Ships
         c_coords = np.argwhere(board.board == 64) #C
         ships[0] += len(c_coords)
+
         for row in range(10):
             for col in range(10):
                 '''
