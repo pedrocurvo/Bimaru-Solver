@@ -28,14 +28,14 @@ class BimaruState:
 
     def __init__(self, board):
         if BimaruState.state_id == 0:
-            Bimaru.fill_water_rows_cols(board)
-            Bimaru.fill_water_around_ship(board)
+            #Bimaru.fill_water_rows_cols(board)
+            #Bimaru.fill_water_around_ship(board)
             self.ships = Bimaru.count_ships(board)
         else:
-            self.ships = [0, 0, 0, 0]
+            self.ships = np.array([0, 0, 0, 0])
         self.board = board
         self.id = BimaruState.state_id
-        self.expectated_ships = [4, 3, 2, 1]
+        #self.expectated_ships = np.array([4, 3, 2, 1])
         BimaruState.state_id += 1
 
     def __lt__(self, other):
@@ -48,6 +48,7 @@ class BimaruState:
 
 class Board:
     """Representação interna de um tabuleiro de Bimaru."""
+    testify = 0
 
     def __init__(self, board: np.ndarray, col_number = None, row_number = None):
         """Construtor da classe. Recebe um array bidimensional
@@ -55,6 +56,7 @@ class Board:
         self.board = board
         self.col_number = col_number
         self.row_number = row_number
+        self.ships = np.array([0, 0, 0, 0])
     
     def __add__(self, other):
         """Soma de dois tabuleiros."""
@@ -115,43 +117,57 @@ class Board:
     @staticmethod
     def match_boards(board1, board2):
         """Verifies if two boards match."""
+        start_time = time.time()
+        Board.testify += time.time() - start_time
         for row in range(10):
             for col in range(10):
-                if board1.board[row][col].upper() != board2.board[row][col].upper() and (board1.board[row][col] != '' and board2.board[row][col] != ''):
+                if board1.board[row][col].lower() != board2.board[row][col] and (board1.board[row][col] != '' and board2.board[row][col] != ''):
+                    Board.testify += time.time() - start_time
                     return False
         #Built in this 
         matrix = np.zeros((10, 10))
+        matrix = np.where((board1.board != '') & (board1.board != 'w') & (board1.board != 'W'), 1, 0)
+        matrix = np.where((board2.board != '') & (board2.board != 'w'), 1, matrix)
+
+        '''
         for row in range(10):
             for col in range(10):
                 if board1.board[row][col] not in ['', 'w', 'W']:
                     matrix[row][col] = 1
                 if board2.board[row][col] not in ['', 'w', 'W']:
                     matrix[row][col] = 1
+        '''
         
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
         
         for i in range(10):
             if col_compare[i] > board1.col_number[i] or row_compare[i] > board1.row_number[i]:
+                Board.testify += time.time() - start_time
                 return False
         # Other conditions
         for row in range(10):
             for col in range(10):
-                if board1.board[row][col] in {'t', 'T'} and row + 2 < 9 and board2.board[row + 2][col] in ('c', 'C', 'l', 'L', 'R', 'r', 't', 'T'):
+                if board1.board[row][col] in {'t', 'T'} and row + 2 < 9 and board2.board[row + 2][col] in ('c', 'l', 'r', 't'):
+                    Board.testify += time.time() - start_time
                     return False
-                if board.board[row][col] in {'b', 'B'} and row - 2 > 0 and board2.board[row - 2][col] in {'c', 'C', 'l', 'L', 'R', 'r', 'b', 'B'}:
+                if board1.board[row][col] in {'b', 'B'} and row - 2 > 0 and board2.board[row - 2][col] in {'c', 'l', 'r', 'b'}:
+                    Board.testify += time.time() - start_time
                     return False
-                if board.board[row][col] in {'l', 'L'} and col + 2 < 9 and board2.board[row][col + 2] in ('c', 'C', 't', 'T', 'B', 'b', 'l', 'L'):
+                if board1.board[row][col] in {'l', 'L'} and col + 2 < 9 and board2.board[row][col + 2] in ('c', 't', 'b', 'l'):
+                    Board.testify += time.time() - start_time
                     return False
-                if board.board[row][col] in {'r', 'R'} and col - 2 > 0 and board2.board[row][col - 2] in ('c', 'C', 't', 'T', 'B', 'b', 'r', 'R'):
+                if board1.board[row][col] in {'r', 'R'} and col - 2 > 0 and board2.board[row][col - 2] in ('c', 't', 'b', 'r'):
+                    Board.testify += time.time() - start_time
                     return False
         aim = 0
         for row in range(10):
             for col in range(10):
-                if board2.board[row][col].upper() in {'C', 'T', 'B', 'L', 'R'} and board2.board[row][col].upper() != board1.board[row][col].upper():
+                if board2.board[row][col] in {'c', 't', 'b', 'l', 'r'} and board2.board[row][col] != board1.board[row][col].lower():
                     aim += 1
         if aim == 0 : return False
-
+        #Board.testify += time.time() - start_time
+        #print("Testify: ", Board.testify)
         return True
     
 
@@ -180,11 +196,11 @@ class Board:
 class Bimaru(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
-        self.initial = BimaruState(board)
         Bimaru.fill_water_rows_cols(board)
         Bimaru.fill_water_around_ship(board)
         Bimaru.fill_water(board)
-        self.board = board
+        self.initial = BimaruState(board)
+        #self.board = board
         self.expected_ships = [4, 3, 2, 1] # change to Bimaru expected ships
         self.ships = Bimaru.count_ships(board)
         self.first_options = Bimaru.create_all_first_options(board)
@@ -193,17 +209,48 @@ class Bimaru(Problem):
     def actions(self, state: BimaruState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        if state.ships[3] != state.expectated_ships[3]:
+        if state.ships[3] != self.expected_ships[3]:
             return self.first_options[4]
-        if state.ships[2] != state.expectated_ships[2]:
-            lista = [option for option in self.first_options[3] if Board.match_boards(state.board, option)]
-            return lista
-        if state.ships[1] != state.expectated_ships[1]:
-            lista = [option for option in self.first_options[2] if Board.match_boards(state.board, option)]
-            return lista
-        if state.ships[0] != state.expectated_ships[0]:
-            lista = [option for option in self.first_options[1] if Board.match_boards(state.board, option)]
-            return lista
+        if state.ships[2] != self.expected_ships[2]:
+            return [
+                option
+                for option in self.first_options[3]
+                if Board.match_boards(state.board, option)
+            ]
+        if state.ships[1] != self.expected_ships[1]:
+            return [
+                option
+                for option in self.first_options[2]
+                if Board.match_boards(state.board, option)
+            ]
+        if state.ships[0] != self.expected_ships[0]:
+            #print("State: \n", state.board.board)
+            '''
+            options = []
+            matrix = np.zeros((10, 10), dtype=str)
+            board_new = Board(matrix)
+            board_new.ships = [1, 0, 0, 0]
+            for row in range(10):
+                for col in range(10):
+                    if state.board.board[row][col] == '':
+                        board_new.board[row][col] = 'c'
+                        if Board.match_boards(state.board, board_new):
+                            options.append(board_new)
+            return options
+            '''
+            options = []
+            for option in self.first_options[1]:
+                coordinate = np.argwhere(option.board == 'c')[0]
+                if state.board.board[coordinate[0]][coordinate[1]] == '':
+                    options.append(option)
+
+            return [
+                option
+                for option in options
+                if Board.match_boards(state.board, option)
+            ]
+
+        
 
     def result(self, state: BimaruState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -213,7 +260,10 @@ class Bimaru(Problem):
         new_board = state.board + action
         Bimaru.fill_water(new_board)
         new_state = BimaruState(new_board)
-        new_state.ships = [state.ships[i] + Bimaru.count_ships(action)[i] for i in range(4)]
+        #new_state.ships = [state.ships[i] + Bimaru.count_ships(action)[i] for i in range(4)]
+        new_state.ships = np.add(state.ships, action.ships)
+        #[state.ships[i] + action.ships[i] for i in range(4)]
+
         return new_state
 
 
@@ -221,7 +271,8 @@ class Bimaru(Problem):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas de acordo com as regras do problema."""
-        #return state.ships == self.expected_ships
+        return np.array_equal(state.ships, self.expected_ships)
+        return state.ships == self.expected_ships
         if state.ships != self.expected_ships:
             return False
         matrix = np.zeros((10, 10))
@@ -241,8 +292,27 @@ class Bimaru(Problem):
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
+        return random.randint(1, 5)
+        matrix = np.zeros((10, 10))
+        np.where(matrix, node.state.board.board != '', 1)
+        col_compare = matrix.sum(axis=0)
+        row_compare = matrix.sum(axis=1)
+        value = 0
+        value2 = 0
+        for i in range(10):
+            for j in range(10):
+                value += matrix[i][j]
+            value2 += abs(col_compare[i] - node.state.board.col_number[i])
+            value2 += abs(row_compare[i] - node.state.board.row_number[i])
+        value3 = 0
+        for i in range(4):
+            value3 += abs(node.state.ships[i] - node.state.expectated_ships[i]) * i
+        if value >= value3:
+            return 40
+        return 0
+
         #print(type(self))
-        return random.randint(0, 9)
+        #return random.randint(0, 9)
     
     @staticmethod
     def fill_water_rows_cols(board: Board):
@@ -252,15 +322,6 @@ class Bimaru(Problem):
                 board.board[coordinate] = ['w' for _ in range(10)]
             if board.col_number[coordinate] == 0:
                 board.board[:, coordinate] = ['w' for _ in range(10)]
-
-    '''
-        for row in range(10):
-            if board.row_number[row] == 0:
-                board.board[row] = ['w' for _ in range(10)]
-        for col in range(10):
-            if board.col_number[col] == 0:
-                board.board[:, col] = ['w' for _ in range(10)]
-    '''
 
     @staticmethod
     def fill_water_around_ship(board: Board):
@@ -353,6 +414,7 @@ class Bimaru(Problem):
         matrix = np.where(np.isin(board.board, valid_values), 0, 1)
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
+        
         for row in range(10):
             for col in range(10):
                 if board.board[row][col] == '' and (col_compare[col] == board.col_number[col] or row_compare[row] == board.row_number[row]):
@@ -390,6 +452,7 @@ class Bimaru(Problem):
                             np_matrix = np.zeros((10, 10), dtype=str)
                             np_matrix[row] = np_row[0]
                             obj = Board(np_matrix)
+                            obj.ships[ship_length - 1] += 1
                             Bimaru.fill_water_around_ship(obj)
                             if Board.match_boards(board, obj):
                                 options[ship_length].append(obj)
@@ -407,6 +470,7 @@ class Bimaru(Problem):
                             np_matrix = np.zeros((10, 10), dtype=str)
                             np_matrix[col] = np_row[0]
                             obj = Board(np_matrix.transpose())
+                            obj.ships[ship_length - 1] += 1
                             Bimaru.fill_water_around_ship(obj)
                             if Board.match_boards(board, obj):
                                 options[ship_length].append(obj)
@@ -419,4 +483,5 @@ if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
     goal_node = depth_first_tree_search(problem)
+    #goal_node = astar_search(problem)
     goal_node.state.print()
