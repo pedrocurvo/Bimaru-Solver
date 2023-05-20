@@ -133,9 +133,15 @@ class Board:
         test_board = board1 + board2
         if np.array_equal(test_board.board, board1.board): return False #garante que os dois tabuleiros são diferentes ou que o board1 não contem já o board2
 
+
+        values = [0, 1, 2, 4, 8, 16, 32, 64]
+        count_different = np.count_nonzero(~np.isin(test_board.board, values))
+        if count_different > 0: return False #garante que os valores do tabuleiro são válidos
+        '''
         for row, col in itertools.product(range(10), range(10)):
             if test_board.board[row][col] not in {0, 1, 2, 4, 8, 16, 32, 64}:
                 return False
+        '''
 
         '''
         for row in test_board.board:
@@ -263,6 +269,8 @@ class Bimaru(Problem):
             [11.5, 14.3, 16.6, 17.8, 18.4, 18.4, 17.8, 16.6, 14.3, 11.5],
             [8.0, 11.5, 14.3, 15.9, 16.7, 16.7, 15.9, 14.3, 11.5, 8.0],
             ])
+    normalization = np.sum(probabilistic_grid)
+    
 
 
     def __init__(self, board: Board):
@@ -320,7 +328,7 @@ class Bimaru(Problem):
                 coordinate = np.argwhere(option.board == 64)[0]
                 if state.board.board[coordinate[0]][coordinate[1]] == 0:
                     options.append(option)
-            #np.random.shuffle(options)
+            np.random.shuffle(options)
             return [
                 option
                 for option in options
@@ -354,7 +362,9 @@ class Bimaru(Problem):
         matrix = np.where(node.state.board == 1, 0, matrix)
         matrix2 = np.where(node.action.board == 0, 0, Bimaru.probabilistic_grid)
         matrix2 = np.where(node.action.board == 1, 0, matrix2)
-        return np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7
+        value = round(((np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization - 3) * 100 )
+        return value 
+        return (np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization
 
     @staticmethod
     def fill_water_rows_cols(board: Board):
@@ -376,7 +386,7 @@ class Bimaru(Problem):
     @staticmethod
     def fill_water_around_ship(board: Board):
         """Preenche com água as posições em redor de um barco."""
-        # Put argwhere instead of for
+        # Find Pieces
         coordinates_c = np.argwhere(board.board == 64)
         coordinates_m = np.argwhere(board.board == 32)
         coordinates_b = np.argwhere(board.board == 4)
@@ -611,7 +621,6 @@ if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
     #goal_node = depth_first_tree_search(problem)
-    #goal_node = recursive_best_first_search(problem)
-    goal_node = greedy_search(problem)
-    #goal_node = astar_search(problem)
+    #goal_node = greedy_search(problem)
+    goal_node = astar_search(problem)
     goal_node.state.print()
