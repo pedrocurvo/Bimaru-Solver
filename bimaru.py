@@ -7,8 +7,6 @@
 # 00000 Nome2
 import itertools
 import sys
-import time
-import random
 import numpy as np
 from search import (
     Problem,
@@ -64,7 +62,7 @@ class Board:
 
     def get_value(self, row: int, col: int) -> str:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        return None if self.board[row][col] == 0 else self.board[row][col]
+        return None if self.board[row, col] == 0 else self.board[row, col]
 
     def adjacent_vertical_values(self, row: int, col: int):
         """Devolve os valores imediatamente acima e abaixo,
@@ -96,21 +94,21 @@ class Board:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         if col == 0:
-            if self.board[row][col + 1] == 0:
+            if self.board[row, col + 1] == 0:
                 return None, None
-            return None, self.board[row][col + 1]
+            return None, self.board[row, col + 1]
         elif col == 9:
-            if self.board[row][col - 1] == 0:
+            if self.board[row, col - 1] == 0:
                 return None, None
-            return self.board[row][col - 1], None
+            return self.board[row, col - 1], None
         else:
-            if self.board[row][col - 1] == 0:
-                if self.board[row][col + 1] == 0:
+            if self.board[row, col - 1] == 0:
+                if self.board[row, col + 1] == 0:
                     return None, None
-                return None, self.board[row][col + 1]
+                return None, self.board[row, col + 1]
             elif self.board[row][col + 1] == 0:
-                return self.board[row][col - 1], None
-            return self.board[row][col - 1], self.board[row][col + 1]
+                return self.board[row, col - 1], None
+            return self.board[row, col - 1], self.board[row, col + 1]
 
     def print(self):
         """Imprime o tabuleiro."""
@@ -118,11 +116,11 @@ class Board:
         board_array = np.empty((10, 10), dtype=str)
         for row, col in itertools.product(range(10), range(10)):
             if (row, col) in Board.hints:
-                board_array[row][col] = Board.int_to_str[self.board[row][col]].upper()
+                board_array[row, col] = Board.int_to_str[self.board[row, col]].upper()
             elif (row, col) in Board.water_hints:
-                board_array[row][col] = 'W'
+                board_array[row, col] = 'W'
             else:
-                board_array[row][col] = Board.int_to_str[self.board[row][col]]
+                board_array[row, col] = Board.int_to_str[self.board[row, col]]
 
         # Print the board
         print('\n'.join([''.join(row) for row in board_array]))
@@ -137,95 +135,35 @@ class Board:
         values = [0, 1, 2, 4, 8, 16, 32, 64]
         count_different = np.count_nonzero(~np.isin(test_board.board, values))
         if count_different > 0: return False #garante que os valores do tabuleiro são válidos
-        '''
-        for row, col in itertools.product(range(10), range(10)):
-            if test_board.board[row][col] not in {0, 1, 2, 4, 8, 16, 32, 64}:
-                return False
-        '''
 
-        '''
-        for row in test_board.board:
-            for number in row:
-                if number not in (0, 1, 2, 4, 8, 16, 32, 64):
-                    return False
-        '''
-
-
-        ''' O que é que isto faz mesmo?
-        for row in range(10):
-            for col in range(10):
-                if board1.board[row][col] != board2.board[row][col] and board1.board[row][col] != 0 and board2.board[row][col] != 0:
-                    return False
-        '''
         # Check the number of ships per column and row
-        #matrix = np.zeros((10, 10))
-        #matrix = np.where((board1.board != 0) & (board1.board != 1), 1, 0)
-        #matrix = np.where((board2.board != 0) & (board2.board != 1), 1, matrix)
         matrix = np.where((test_board.board != 0) & (test_board.board != 1), 1, 0)
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
-        
+
         if np.any(col_compare > board1.col_number) or np.any(row_compare > board1.row_number): return False
-        '''
-        for i in range(10):
-            if col_compare[i] > board1.col_number[i] or row_compare[i] > board1.row_number[i]:
-                return False
-        '''
-        '''    
-        aim = 0
-        for row in range(10):
-            for col in range(10):
-                if board2.board[row][col] in {64, 2, 4, 8, 16} and board2.board[row][col] != board1.board[row][col]:
-                    aim += 1
-        if aim == 0 : return False 
-        '''
+
         # Other conditions
         coordinate_t = np.argwhere(board1.board == 2) #t
         coordinate_b = np.argwhere(board1.board == 4) #b
         coordinate_l = np.argwhere(board1.board == 8) #l
         coordinate_r = np.argwhere(board1.board == 16) #r
         for i in range(len(coordinate_t)):
-            if coordinate_t[i][0] < 7 and board2.board[coordinate_t[i][0] + 1][coordinate_t[i][1]] == 1: return False
-            '''
-            if coordinate_t[i][0] < 7 and board2.board[coordinate_t[i][0] + 2][coordinate_t[i][1]] in ('c', 'l', 'r', 't'):
-                return False
-            '''
+            if coordinate_t[i][0] < 7 and board2.board[coordinate_t[i][0] + 1, coordinate_t[i][1]] == 1: return False
         for i in range(len(coordinate_b)):
-            if coordinate_b[i][0] > 2 and board2.board[coordinate_b[i][0] - 1][coordinate_b[i][1]] == 1: return False
-            '''
-            if coordinate_b[i][0] > 2 and board2.board[coordinate_b[i][0] - 2][coordinate_b[i][1]] in {64, 8, 16, 4}:
-                return False
-            '''
+            if coordinate_b[i][0] > 2 and board2.board[coordinate_b[i][0] - 1, coordinate_b[i][1]] == 1: return False
         for i in range(len(coordinate_l)):
-            if coordinate_l[i][1] < 7 and board2.board[coordinate_l[i][0]][coordinate_l[i][1] + 1] == 1: return False
-            '''
-            if coordinate_l[i][1] < 7 and board2.board[coordinate_l[i][0]][coordinate_l[i][1] + 2] in (64, 2, 4, 8): #'c', 't', 'b', 'l'):
-                return False
-            '''
-        for i in range(len(coordinate_r)):
-            if coordinate_r[i][1] > 2 and board2.board[coordinate_r[i][0]][coordinate_r[i][1] - 1] == 1: return False
-            '''
-            if coordinate_r[i][1] > 2 and board2.board[coordinate_r[i][0]][coordinate_r[i][1] - 2] in (64, 2, 4, 16):#('c', 't', 'b', 'r'):
-                return False
-            '''
+            if coordinate_l[i][1] < 7 and board2.board[coordinate_l[i][0], coordinate_l[i][1] + 1] == 1: return False
+        return not any(
+            coordinate_r[i][1] > 2
+            and board2.board[coordinate_r[i][0], coordinate_r[i][1] - 1] == 1
+            for i in range(len(coordinate_r))
+        )
+    
+        #for i in range(len(coordinate_r)):
+        #    if coordinate_r[i][1] > 2 and board2.board[coordinate_r[i][0]][coordinate_r[i][1] - 1] == 1: return False
 
-        '''
-        for row in range(10):
-            for col in range(10):
-                if board1.board[row][col] in {'t', 'T'} and row + 2 < 9 and board2.board[row + 2][col] in ('c', 'l', 'r', 't'):
-                    Board.testify += time.time() - start_time
-                    return False
-                if board1.board[row][col] in {'b', 'B'} and row - 2 > 0 and board2.board[row - 2][col] in {'c', 'l', 'r', 'b'}:
-                    Board.testify += time.time() - start_time
-                    return False
-                if board1.board[row][col] in {'l', 'L'} and col + 2 < 9 and board2.board[row][col + 2] in ('c', 't', 'b', 'l'):
-                    Board.testify += time.time() - start_time
-                    return False
-                if board1.board[row][col] in {'r', 'R'} and col - 2 > 0 and board2.board[row][col - 2] in ('c', 't', 'b', 'r'):
-                    Board.testify += time.time() - start_time
-                    return False
-        '''
-        return True
+        #return True
     
 
     @staticmethod
@@ -248,7 +186,7 @@ class Board:
         if n_hints > 0:
             for _ in range(n_hints):
                 line = sys.stdin.readline().split()
-                board[int(line[1])][int(line[2])] = Board.str_to_int[line[3]]
+                board[int(line[1]), int(line[2])] = Board.str_to_int[line[3]]
                 if line[3] == 'W':
                     Board.water_hints.append( (int(line[1]), int(line[2])))
                 else:
@@ -282,6 +220,16 @@ class Bimaru(Problem):
         self.expected_ships = np.array([4, 3, 2, 1])
         #self.ships = Bimaru.count_ships(board)
         self.first_options = Bimaru.create_all_first_options(board)
+        '''
+        for row in self.initial.board.row_number:
+            if row != 0 : Bimaru.probabilistic_grid[row] /= row
+            else: Bimaru.probabilistic_grid[row] *= 0 
+        for col in self.initial.board.col_number:
+            if col != 0 : Bimaru.probabilistic_grid[col] /= col
+            else: Bimaru.probabilistic_grid[col] *= 0
+        '''
+
+
 
     
     def actions(self, state: BimaruState):
@@ -302,33 +250,26 @@ class Bimaru(Problem):
                 for option in self.first_options[2]
                 if Board.match_boards(state.board, option)
             ]
-        
-        '''
-        if state.ships[1] != self.expected_ships[1]:
-            options = []
-            for option in self.first_options[2]:
-                coordinate_t = np.argwhere(option.board == 2) # t
-                coordinate_b = np.argwhere(option.board == 8) # l
-
-                if coordinate_t.size > 0 and (state.board.board[coordinate_t[0][0]][coordinate_t[0][1]] == 0 or state.board.board[coordinate_t[0][0] + 1][coordinate_t[0][1]] == 0):
-                    options.append(option)
-                elif coordinate_b.size > 0 and (state.board.board[coordinate_b[0][0]][coordinate_b[0][1]] == 0 or state.board.board[coordinate_b[0][0]][coordinate_b[0][1] + 1] == 0):
-                    options.append(option)
-            #np.random.shuffle(options)
-            return [
-                option
-                for option in options
-                if Board.match_boards(state.board, option)
-            ]
-        '''
 
         if state.ships[0] != self.expected_ships[0]:
             options = []
-            for option in self.first_options[1]:
+            coordinates = np.argwhere(state.board.board == 0)
+            for coordinate in coordinates:
+                matrix = np.zeros((10, 10))
+                matrix[coordinate[0], coordinate[1]] = 64
+                obj = Board(matrix)
+                Bimaru.fill_water_around_ship(obj, activate_c = True)
+                obj.ships[0] += 1
+                if Board.match_boards(state.board, obj): options.append(obj)
+            #np.random.shuffle(options)
+            return options
+
+            '''for option in self.first_options[1]:
                 coordinate = np.argwhere(option.board == 64)[0]
-                if state.board.board[coordinate[0]][coordinate[1]] == 0:
+                if state.board.board[coordinate[0], coordinate[1]] == 0:
                     options.append(option)
-            np.random.shuffle(options)
+            '''
+
             return [
                 option
                 for option in options
@@ -366,7 +307,7 @@ class Bimaru(Problem):
         #matrix = np.where(node.state.board == 1, 0, matrix)
         matrix2 = np.where(node.action.board == 0, 0, Bimaru.probabilistic_grid)
         matrix2 = np.where(node.action.board == 1, 0, matrix2)
-
+    
         #if h_common_values != 0: return 10 / np.sum(matrix2) / h_common_values
         return (1 + h_common_values) * np.sum(matrix2) * 10 / Bimaru.normalization
         return abs(100 - np.sum(matrix2) * 10)
@@ -385,124 +326,83 @@ class Bimaru(Problem):
             board.board[coordinate[0]] = [1 for _ in range(10)]
         for coordinate in col_coordinates:
             board.board[:, coordinate[0]] = [1 for _ in range(10)]
-        return None
 
-        for coordinate in range(10):
-            if board.row_number[coordinate] == 0:
-                board.board[coordinate] = [1 for _ in range(10)]
-            if board.col_number[coordinate] == 0:
-                board.board[:, coordinate] = [1 for _ in range(10)]
 
     @staticmethod
-    def fill_water_around_ship(board: Board):
+    def fill_water_around_ship(board: Board, activate_c = False, activate_dual = False):
         """Preenche com água as posições em redor de um barco."""
         # Find Pieces
         coordinates_c = np.argwhere(board.board == 64)
-        coordinates_m = np.argwhere(board.board == 32)
-        coordinates_b = np.argwhere(board.board == 4)
-        coordinates_t = np.argwhere(board.board == 2)
-        coordinates_l = np.argwhere(board.board == 8)
-        coordinates_r = np.argwhere(board.board == 16)
+        if not activate_c:
+            if not activate_dual:
+                coordinates_m = np.argwhere(board.board == 32)
+            coordinates_b = np.argwhere(board.board == 4)
+            coordinates_t = np.argwhere(board.board == 2)
+            coordinates_l = np.argwhere(board.board == 8)
+            coordinates_r = np.argwhere(board.board == 16)
         # Fill around C
         for coordinate in coordinates_c:
-            row = coordinate[0]
-            col = coordinate[1]
-            for i, j in itertools.product(range(row - 1, row + 2), range(col - 1, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10 and board.board[i][j] != 64:
-                    board.board[i][j] = 1
-        # Fill around M
-        for coordinate in coordinates_m:
-            row = coordinate[0]
-            col = coordinate[1]
-            for i, j in itertools.product(range(row - 1, row + 2), range(col - 1, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10  and j != col and i != row:
-                    board.board[i][j] = 1 #w
+            row, col = coordinate[0], coordinate[1]
+            '''row_range = range(max(0, row - 1), min(10, row + 2))
+            col_range = range(max(0, col - 1), min(10, col + 2))
+            for i, j in itertools.product(row_range, col_range):
+                if board.board[i][j] != 64: board.board[i][j] = 1
+            '''
+            r_min, r_max = max(0, row - 1), min(10, row + 2)
+            c_min, c_max = max(0, col - 1), min(10, col + 2)
+            board.board[r_min:r_max, c_min:c_max] = np.where(board.board[r_min:r_max, c_min:c_max] != 64, 1, board.board[r_min:r_max, c_min:c_max])
+        if activate_c: return
 
-            # Terminal M
-            if row == 0: board.board[row + 1][col] = 1
-            elif row == 9: board.board[row - 1][col] = 1
-            if col == 0: board.board[row][col + 1] = 1
-            elif col == 9: board.board[row][col - 1] = 1
+            
+
+        
         # Fill around B
         for coordinate in coordinates_b:
-            row = coordinate[0]
-            col = coordinate[1]
-            for i, j in itertools.product(range(row - 2, row + 2), range(col - 1, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 4 and j != col or i > row):
-                    board.board[i][j] = 1 #w
+            row, col = coordinate[0], coordinate[1]
+            row_range = range(max(0, row - 2), min(10, row + 2))
+            col_range = range(max(0, col - 1), min(10, col + 2))
+            for i, j in itertools.product(row_range, col_range):
+                if (board.board[i, j] != 4 and j != col or i > row): board.board[i, j] = 1 #w
+
         # Fill around T
         for coordinate in coordinates_t:
-            row = coordinate[0]
-            col = coordinate[1]
-            for i, j in itertools.product(range(row - 1, row + 3), range(col - 1, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 2 and j != col or i < row):
-                    board.board[i][j] = 1 #w
+            row, col = coordinate[0], coordinate[1]
+            row_range = range(max(0, row - 1), min(10, row + 3))
+            col_range = range(max(0, col - 1), min(10, col + 2))
+            for i, j in itertools.product(row_range, col_range):
+                if (board.board[i, j] != 2 and j != col or i < row): board.board[i, j] = 1 #w
         # Fill around L
         for coordinate in coordinates_l:
             row = coordinate[0]
             col = coordinate[1]
-            for i, j in itertools.product(range(row - 1, row + 2), range(col - 1, col + 3)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 8 and i != row or j < col):
-                    board.board[i][j] = 1 #w
+            row_range = range(max(0, row - 1), min(10, row + 2))
+            col_range = range(max(0, col - 1), min(10, col + 3))
+            for i, j in itertools.product(row_range, col_range):
+                if (board.board[i, j] != 8 and i != row or j < col): board.board[i, j] = 1 #w
         # Fill around R
         for coordinate in coordinates_r:
             row = coordinate[0]
             col = coordinate[1]
-            for i, j in itertools.product(range(row - 1, row + 2), range(col - 2, col + 2)):
-                if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 16 and i != row or j > col):
-                    board.board[i][j] = 1 #w
-        '''                        
-        for row in range(10):
-            for col in range(10):
-                
-                # Fill around C 
-                if board.board[row][col] == 64: #c
-                    for i in range(row - 1, row + 2):
-                        for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10 and board.board[i][j] != 64:
-                                board.board[i][j] = 1 #w
-                
-                # Fill around M
-                if board.board[row][col] == 32:
-                    for i in range(row - 1, row + 2):
-                        for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 64 and j != col and i != row):
-                                board.board[i][j] = 1 #w
-                    
-                    # Terminal M               
-                    if row == 9: board.board[row - 1][col] = 1
-                    elif row == 0: board.board[row + 1][col] = 1
-                    if col == 9: board.board[row][col - 1] = 1
-                    elif col == 0: board.board[row][col + 1] = 1
-                
-                # Fill around B
-                if board.board[row][col] == 4:
-                    for i in range(row - 2, row + 2):
-                        for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 4 and j != col or i > row):
-                                board.board[i][j] = 1 #w
-                
-                # Fill around T
-                if board.board[row][col] == 2:
-                    for i in range(row - 1, row + 3):
-                        for j in range(col - 1, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 2 and j != col or i < row):
-                                board.board[i][j] = 1 #w
+            row_range = range(max(0, row - 1), min(10, row + 2))
+            col_range = range(max(0, col - 2), min(10, col + 2))
+            for i, j in itertools.product(row_range, col_range):
+                if (board.board[i, j] != 16 and i != row or j > col): board.board[i, j] = 1 #w
+        if activate_dual: return
+        # Fill around M
+        for coordinate in coordinates_m:
+            row, col = coordinate[0], coordinate[1]
+            row_range = range(max(0, row - 1), min(10, row + 2))
+            col_range = range(max(0, col - 1), min(10, col + 2))
+            for i, j in itertools.product(row_range, col_range):
+                if j != col and i != row: board.board[i, j] = 1 #w
 
-                # Fill around L
-                if board.board[row][col] == 8:
-                    for i in range(row - 1, row + 2):
-                        for j in range(col - 1, col + 3):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 8 and i != row or j < col):
-                                board.board[i][j] = 1 #w
-                # Fill around R
-                if board.board[row][col] == 16:
-                    for i in range(row - 1, row + 2):
-                        for j in range(col - 2, col + 2):
-                            if i >= 0 and i < 10 and j >= 0 and j < 10 and (board.board[i][j] != 16 and i != row or j > col):
-                                board.board[i][j] = 1 #w
-                '''
-                    
+            # Terminal M
+            if row == 0: board.board[row + 1, col] = 1
+            elif row == 9: board.board[row - 1, col] = 1
+            if col == 0: board.board[row, col + 1] = 1
+            elif col == 9: board.board[row, col - 1] = 1
+
+    
     @staticmethod
     def count_ships(board: Board):
         """Conta o número de barcos de cada tipo presentes no tabuleiro."""
@@ -516,9 +416,9 @@ class Bimaru(Problem):
             row, col = coordinate[0], coordinate[1]
             ship_length = 1
             for i in range(row + 1, row + 4):
-                if i < 10 and board.board[i][col] == 32: #M
+                if i < 10 and board.board[i, col] == 32: #M
                     ship_length += 1
-                elif i < 10 and board.board[i][col] == 4: #B
+                elif i < 10 and board.board[i, col] == 4: #B
                     ship_length += 1
                     ships[ship_length - 1] += 1
                     break
@@ -529,14 +429,15 @@ class Bimaru(Problem):
             row, col = coordinate[0], coordinate[1]
             ship_length = 1
             for i in range(col + 1, col + 4):
-                if i < 10 and board.board[row][i] == 32: #M
+                if i < 10 and board.board[row, i] == 32: #M
                     ship_length += 1
-                elif i < 10 and board.board[row][i] == 16: #R
+                elif i < 10 and board.board[row, i] == 16: #R
                     ship_length += 1
                     ships[ship_length - 1] += 1
                     break
                 else: break
         return ships
+
 
     @staticmethod
     def fill_water(board: Board):
@@ -555,73 +456,65 @@ class Bimaru(Problem):
             row = row[0]
             board.board[row] = np.where(board.board[row] == 0, 1, board.board[row])
             
-        '''
-        for row, col in itertools.product(range(10), range(10)):
-            # This can be changed
-            if board.board[row][col] == 0 and (col_compare[col] == board.col_number[col] or row_compare[row] == board.row_number[row]):
-                board.board[row][col] = 1
-        '''
-
-
 
     @staticmethod
     def create_all_first_options(board: Board):
         """Cria todas as opções iniciais possíveis."""
         def matching_rows(row1, row2): 
-            for i in range(10):
-                if row1[i] != row2[i]:
-                    if row1[i] != 0 and row2[i] != 0:
-                        return False
-                elif row1[i] == 64: #C
-                    return False
-            return True
+            new_board= np.where(row1 != row2, row1 + row2, row1)
+            if np.array_equal(new_board, row1): return False
+            values = [0, 1, 2, 4, 8, 16, 32, 64]
+            count_different = np.count_nonzero(~np.isin(new_board, values))
+            return count_different <= 0
 
         options = {1: [], 2: [], 3: [], 4: []}
-        # Horizontals 
-        for row in range(10):
-            for ship_length in range(1, 5):
-                if board.row_number[row] >= ship_length:
+
+        ship_lengths_horizontal = range(2, 5)
+        for row_or_col in range(10):
+            # Horizontals
+            for ship_length in ship_lengths_horizontal:
+                if board.row_number[row_or_col] >= ship_length:
                     for i in range(11 - ship_length):
-                        np_row = np.zeros((1, 10))
+                        if ship_length == 2: x = True
+                        else: x = False
+                        test_row = np.zeros((1, 10))
 
                         # Create the row with a ship
-                        if ship_length == 1: np_row[0][i] = 64 #c
-                        else:
-                            np_row[0][i] = 8 #l
-                            for k in range(1, ship_length - 1):
-                                np_row[0][i+k] = 32 #m
-                            np_row[0][i+ship_length-1] = 16 #r
-                        
-                        if matching_rows(board.board[row], np_row[0]):
+                        #if ship_length == 1: test_row[0][i] = 64 #c
+                        #else:
+                        test_row[0][i] = 8 #l
+                        test_row[0][i+1:i+ship_length-1] = 32  # m
+                        test_row[0][i+ship_length-1] = 16 #r
+
+                        if matching_rows(board.board[row_or_col], test_row[0]):
                             np_matrix = np.zeros((10, 10))
-                            np_matrix[row] = np_row[0]
-                            obj = Board(np_matrix)
-                            obj.ships[ship_length - 1] += 1
-                            Bimaru.fill_water_around_ship(obj)
-                            if Board.match_boards(board, obj):
-                                options[ship_length].append(obj)
-                #random.shuffle(options[ship_length])
-        # Verticals
-        for col in range(10):
-            for ship_length in range(2, 5):
-                if board.col_number[col] >= ship_length:
+                            np_matrix[row_or_col] = test_row[0]
+                            option_for_board = Board(np_matrix)
+                            option_for_board.ships[ship_length - 1] += 1
+                            Bimaru.fill_water_around_ship(option_for_board, activate_dual=x)
+                            if Board.match_boards(board, option_for_board):
+                                options[ship_length].append(option_for_board)
+            # Verticals
+            #for ship_length in ship_lengths_vertical:
+                if board.col_number[row_or_col] >= ship_length and ship_length > 1:
                     for i in range(11 - ship_length):
-                        np_row = np.zeros((1, 10))
-                        np_row[0][i] = 2 #t
-                        for j in range(ship_length - 2):
-                            np_row[0][i+j+1] = 32 #m
-                        np_row[0][i+ship_length-1] = 4 #b
-                        if matching_rows(board.board[:,col], np_row[0]):
+                        if ship_length == 2: x = True
+                        else: x = False
+                        test_row = np.zeros((1, 10))
+                        test_row[0][i] = 2 #t
+                        test_row[0][i+1:i+ship_length-1] = 32  # m
+                        test_row[0][i+ship_length-1] = 4 #b
+                        if matching_rows(board.board[:,row_or_col], test_row[0]):
                             np_matrix = np.zeros((10, 10))
-                            np_matrix[:, col] = np_row[0]
-                            obj = Board(np_matrix)
-                            obj.ships[ship_length - 1] += 1
-                            Bimaru.fill_water_around_ship(obj)
-                            if Board.match_boards(board, obj):
-                                options[ship_length].append(obj)
-        #for ship_length in range(2, 5):
-        #    np.random.shuffle(options[ship_length])
-        np.random.shuffle(options[4])
+                            np_matrix[:, row_or_col] = test_row[0]
+                            option_for_board = Board(np_matrix)
+                            option_for_board.ships[ship_length - 1] += 1
+                            Bimaru.fill_water_around_ship(option_for_board, activate_dual=x)
+                            if Board.match_boards(board, option_for_board):
+                                options[ship_length].append(option_for_board)
+        for ship_length in range(2, 5):
+            np.random.shuffle(options[ship_length])
+        #np.random.shuffle(options[4])
         return options
 
 
@@ -633,8 +526,8 @@ if __name__ == "__main__":
     if len(problem.initial.board.hints) > 2:
         goal_node = depth_first_tree_search(problem)
     else:
-        #goal_node = greedy_search(problem)
-        goal_node = astar_search(problem)
+        goal_node = greedy_search(problem)
+        #goal_node = astar_search(problem)
 
     #goal_node = astar_search(problem)
     goal_node.state.print()

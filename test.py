@@ -1,9 +1,10 @@
 import numpy as np
 
-array = np.array([[1, 2, 3, 4, 5, 6, 7], 
-                 [1, 2, 3, 4, 5, 6, 7]])
-values = [2, 4, 6, 7]
+# Create a matrix
+matrix = np.array([[1, 2, 3],
+                   [4, 5, 6],
+                   [7, 8, 9]])
 
-count_different = np.count_nonzero(~np.isin(array, values))
+# Print the submatrix
+print(matrix[1, 2])
 
-print(count_different)
