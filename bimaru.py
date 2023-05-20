@@ -96,19 +96,19 @@ class Board:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         if col == 0:
-            if self.board[row][col + 1] == '':
+            if self.board[row][col + 1] == 0:
                 return None, None
             return None, self.board[row][col + 1]
         elif col == 9:
-            if self.board[row][col - 1] == '':
+            if self.board[row][col - 1] == 0:
                 return None, None
             return self.board[row][col - 1], None
         else:
-            if self.board[row][col - 1] == '':
-                if self.board[row][col + 1] == '':
+            if self.board[row][col - 1] == 0:
+                if self.board[row][col + 1] == 0:
                     return None, None
                 return None, self.board[row][col + 1]
-            elif self.board[row][col + 1] == '':
+            elif self.board[row][col + 1] == 0:
                 return self.board[row][col - 1], None
             return self.board[row][col - 1], self.board[row][col + 1]
 
@@ -358,13 +358,23 @@ class Bimaru(Problem):
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
         if not node.action: return 10
-        matrix = np.where(node.state.board == 0, 0, Bimaru.probabilistic_grid)
-        matrix = np.where(node.state.board == 1, 0, matrix)
+        common_values = np.where(node.action.board == node.parent.state.board.board, 1, 0)
+        h_common_values = np.sum(common_values)
+        
+
+        #matrix = np.where(node.state.board == 0, 0, Bimaru.probabilistic_grid)
+        #matrix = np.where(node.state.board == 1, 0, matrix)
         matrix2 = np.where(node.action.board == 0, 0, Bimaru.probabilistic_grid)
         matrix2 = np.where(node.action.board == 1, 0, matrix2)
+
+        #if h_common_values != 0: return 10 / np.sum(matrix2) / h_common_values
+        return (1 + h_common_values) * np.sum(matrix2) * 10 / Bimaru.normalization
+        return abs(100 - np.sum(matrix2) * 10)
+        return 10 / np.sum(matrix2) / h_common_values
+        return abs(100 - np.sum(matrix2) * 10)
         value = round(((np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization - 3) * 100 )
-        return value 
-        return (np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization
+        return 10 - (np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization
+        return 10 - value 
 
     @staticmethod
     def fill_water_rows_cols(board: Board):
@@ -611,7 +621,7 @@ class Bimaru(Problem):
                                 options[ship_length].append(obj)
         #for ship_length in range(2, 5):
         #    np.random.shuffle(options[ship_length])
-        #np.random.shuffle(options[4])
+        np.random.shuffle(options[4])
         return options
 
 
@@ -620,7 +630,11 @@ class Bimaru(Problem):
 if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
-    #goal_node = depth_first_tree_search(problem)
-    #goal_node = greedy_search(problem)
-    goal_node = astar_search(problem)
+    if len(problem.initial.board.hints) > 2:
+        goal_node = depth_first_tree_search(problem)
+    else:
+        #goal_node = greedy_search(problem)
+        goal_node = astar_search(problem)
+
+    #goal_node = astar_search(problem)
     goal_node.state.print()

@@ -73,23 +73,23 @@ class Board:
         if row == 0:
             return (
                 (None, None)
-                if self.board[row + 1][col] == ''
+                if self.board[row + 1][col] == 0
                 else (None, self.board[row + 1][col])
             )
         elif row == 9:
             return (
                 (None, None)
-                if self.board[row - 1][col] == ''
+                if self.board[row - 1][col] == 0
                 else (self.board[row - 1][col], None)
             )
         else:
-            if self.board[row - 1][col] == '':
+            if self.board[row - 1][col] == 0:
                 return (
                     (None, None)
-                    if self.board[row + 1][col] == ''
+                    if self.board[row + 1][col] == 0
                     else (None, self.board[row + 1][col])
                 )
-            elif self.board[row + 1][col] == '':
+            elif self.board[row + 1][col] == 0:
                 return self.board[row - 1][col], None
             return self.board[row - 1][col], self.board[row + 1][col]
 
@@ -99,23 +99,23 @@ class Board:
         if col == 0:
             return (
                 (None, None)
-                if self.board[row][col + 1] == ''
+                if self.board[row][col + 1] == 0
                 else (None, self.board[row][col + 1])
             )
         elif col == 9:
             return (
                 (None, None)
-                if self.board[row][col - 1] == ''
+                if self.board[row][col - 1] == 0
                 else (self.board[row][col - 1], None)
             )
         else:
-            if self.board[row][col - 1] == '':
+            if self.board[row][col - 1] == 0:
                 return (
                     (None, None)
-                    if self.board[row][col + 1] == ''
+                    if self.board[row][col + 1] == 0
                     else (None, self.board[row][col + 1])
                 )
-            elif self.board[row][col + 1] == '':
+            elif self.board[row][col + 1] == 0:
                 return self.board[row][col - 1], None
             return self.board[row][col - 1], self.board[row][col + 1]
 
