@@ -19,6 +19,10 @@ row_compare = np.array([8, 32, 32, 16])
 col_number = np.array([0, 8, 32, 32, 16, 0, 0, 0, 0, 0])
 row_number = np.array([8, 32, 32, 16])
 
-print(col_compare > col_number)
-if np.any(col_compare > col_number) or np.any(row_compare > row_number):
-    print("False")
+print(col_compare == col_number)
+print(np.argwhere(col_compare == col_number))
+
+matriz = np.array([[0, 8, 32, 32, 16, 0, 0, 0, 0, 0],
+                   [0, 8, 32, 32, 16, 0, 0, 0, 0, 0]])
+matriz[:,0] = np.where(matriz[:,0] == 0, 1, matriz[0])
+print(matriz)

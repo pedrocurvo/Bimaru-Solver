@@ -525,10 +525,22 @@ class Bimaru(Problem):
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
 
+
+        columns = np.argwhere(col_compare == board.col_number)
+        rows = np.argwhere(row_compare == board.row_number)
+        for column in columns:
+            col = column[0]
+            board.board[:,col] = np.where(board.board[:,col] == 0, 1, board.board[:,col])
+        for row in rows:
+            row = row[0]
+            board.board[row] = np.where(board.board[row] == 0, 1, board.board[row])
+            
+        '''
         for row, col in itertools.product(range(10), range(10)):
             # This can be changed
             if board.board[row][col] == 0 and (col_compare[col] == board.col_number[col] or row_compare[row] == board.row_number[row]):
                 board.board[row][col] = 1
+        '''
 
 
 
