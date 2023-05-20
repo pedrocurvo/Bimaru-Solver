@@ -355,44 +355,6 @@ class Bimaru(Problem):
         matrix2 = np.where(node.action.board == 0, 0, Bimaru.probabilistic_grid)
         matrix2 = np.where(node.action.board == 1, 0, matrix2)
         return np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7
-        #print(self.expected_ships.sum(axis=0))
-        #print(self.expected_ships)
-        return np.floor((100 - np.count_nonzero(node.state.board.board))/10)
-        lista = self.actions(node.state)
-        if lista == None: return 1000
-        else: return(len(lista)+1)
-        print(len(self.actions(node.state)))
-        return 1
-        #else: return 1000
-        if node.state.ships[3] != self.expected_ships[3]:
-            return 10
-        if node.state.ships[2] != self.expected_ships[2]:
-            return 9 - node.state.ships[2]
-        if node.state.ships[1] != self.expected_ships[1]:
-            return 8 - node.state.ships[1]
-        if node.state.ships[0] != self.expected_ships[0]:
-            return 7 - node.state.ships[0]
-        return random.randint(1, 5)
-        matrix = np.zeros((10, 10))
-        np.where(matrix, node.state.board.board != '', 1)
-        col_compare = matrix.sum(axis=0)
-        row_compare = matrix.sum(axis=1)
-        value = 0
-        value2 = 0
-        for i in range(10):
-            for j in range(10):
-                value += matrix[i][j]
-            value2 += abs(col_compare[i] - node.state.board.col_number[i])
-            value2 += abs(row_compare[i] - node.state.board.row_number[i])
-        value3 = 0
-        for i in range(4):
-            value3 += abs(node.state.ships[i] - node.state.expectated_ships[i]) * i
-        if value >= value3:
-            return 40
-        return 0
-
-        #print(type(self))
-        #return random.randint(0, 9)
 
     @staticmethod
     def fill_water_rows_cols(board: Board):
