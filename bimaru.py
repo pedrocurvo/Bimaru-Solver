@@ -5,7 +5,6 @@
 # Grupo 102:
 # 00000 Pedro M. P. Curvo
 # 00000 Nome2
-
 import itertools
 import sys
 import time
@@ -252,6 +251,20 @@ class Board:
 
 
 class Bimaru(Problem):
+    probabilistic_grid = np.array([
+            [8.0, 11.5, 14.3, 15.9, 16.7, 16.7, 15.9, 14.3, 11.5, 8.0],
+            [11.5, 14.3, 16.6, 17.8, 18.4, 18.4, 17.8, 16.6, 14.3, 11.5],
+            [14.3, 16.6, 18.4, 19.4, 19.9, 19.9, 19.4, 18.4, 16.6, 14.3],
+            [15.9, 17.8, 19.4, 20.3, 20.8, 20.8, 20.3, 19.4, 17.8, 15.9],
+            [16.7, 18.4, 19.9, 20.8, 21.4, 21.4, 20.8, 19.9, 18.4, 16.7],
+            [16.7, 18.4, 19.9, 20.8, 21.4, 21.4, 20.8, 19.9, 18.4, 16.7],
+            [15.9, 17.8, 19.4, 20.3, 20.8, 20.8, 20.3, 19.4, 17.8, 15.9],
+            [14.3, 16.6, 18.4, 19.4, 29.9, 19.9, 19.4, 18.4, 16.6, 14.3],
+            [11.5, 14.3, 16.6, 17.8, 18.4, 18.4, 17.8, 16.6, 14.3, 11.5],
+            [8.0, 11.5, 14.3, 15.9, 16.7, 16.7, 15.9, 14.3, 11.5, 8.0],
+            ])
+
+
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         Bimaru.fill_water_rows_cols(board)
@@ -336,10 +349,21 @@ class Bimaru(Problem):
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
-
+        if not node.action: return 10
+        matrix = np.where(node.state.board == 0, 0, Bimaru.probabilistic_grid)
+        matrix = np.where(node.state.board == 1, 0, matrix)
+        matrix2 = np.where(node.action.board == 0, 0, Bimaru.probabilistic_grid)
+        matrix2 = np.where(node.action.board == 1, 0, matrix2)
+        return np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7
         #print(self.expected_ships.sum(axis=0))
         #print(self.expected_ships)
-        return random.gauss(1, 10 - self.expected_ships.sum(axis=0) + 1)
+        return np.floor((100 - np.count_nonzero(node.state.board.board))/10)
+        lista = self.actions(node.state)
+        if lista == None: return 1000
+        else: return(len(lista)+1)
+        print(len(self.actions(node.state)))
+        return 1
+        #else: return 1000
         if node.state.ships[3] != self.expected_ships[3]:
             return 10
         if node.state.ships[2] != self.expected_ships[2]:
@@ -369,7 +393,7 @@ class Bimaru(Problem):
 
         #print(type(self))
         #return random.randint(0, 9)
-    
+
     @staticmethod
     def fill_water_rows_cols(board: Board):
         """Preenche com água as linhas e colunas que não contêm barcos."""
@@ -532,39 +556,6 @@ class Bimaru(Problem):
                 else: break
         return ships
 
-        for row in range(10):
-            for col in range(10):
-                '''
-                # Count Single Ships ##Can i put argwhere here?
-                if board.board[row][col] == 64: #C
-                    ships[0] += 1
-                '''
-                # Count Vertical Ships
-                if board.board[row][col] == 2: #T
-                    ship_length = 1
-                    for i in range(row + 1, row + 4):
-                        if i < 10 and board.board[i][col] == 32: #M
-                            ship_length += 1
-                        if i < 10 and board.board[i][col] == 4: #B
-                            ship_length += 1
-                            ships[ship_length - 1] += 1
-                            break
-                        if i < 10 and board.board[i][col] not in (32, 4): #M, B
-                            break
-                # Count Horizontal Ships
-                elif board.board[row][col] == 8: #L
-                    ship_length = 1
-                    for i in range(col + 1, col + 4):
-                        if i < 10 and board.board[row][i] == 32: #M
-                            ship_length += 1
-                        elif i < 10 and board.board[row][i] == 16: #R
-                            ship_length += 1
-                            ships[ship_length - 1] += 1
-                            break
-                        elif i < 10 and board.board[row][i] not in {32, 16}: #M, R
-                            break
-        return ships
-
     @staticmethod
     def fill_water(board: Board):
         valid_values = [0, 1]
@@ -645,8 +636,8 @@ class Bimaru(Problem):
 if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
-    goal_node = depth_first_tree_search(problem)
+    #goal_node = depth_first_tree_search(problem)
     #goal_node = recursive_best_first_search(problem)
+    goal_node = greedy_search(problem)
     #goal_node = astar_search(problem)
     goal_node.state.print()
-    print(goal_node.state.state_id)
