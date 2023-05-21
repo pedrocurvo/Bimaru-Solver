@@ -94,18 +94,24 @@ class Board:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
         if col == 0:
-            if self.board[row, col + 1] == 0:
-                return None, None
-            return None, self.board[row, col + 1]
+            return (
+                (None, None)
+                if self.board[row, col + 1] == 0
+                else (None, self.board[row, col + 1])
+            )
         elif col == 9:
-            if self.board[row, col - 1] == 0:
-                return None, None
-            return self.board[row, col - 1], None
+            return (
+                (None, None)
+                if self.board[row, col - 1] == 0
+                else (self.board[row, col - 1], None)
+            )
         else:
             if self.board[row, col - 1] == 0:
-                if self.board[row, col + 1] == 0:
-                    return None, None
-                return None, self.board[row, col + 1]
+                return (
+                    (None, None)
+                    if self.board[row, col + 1] == 0
+                    else (None, self.board[row, col + 1])
+                )
             elif self.board[row][col + 1] == 0:
                 return self.board[row, col - 1], None
             return self.board[row, col - 1], self.board[row, col + 1]
@@ -214,11 +220,11 @@ class Bimaru(Problem):
         self.first_options = Bimaru.create_all_first_options(board)
 
 
-
     
     def actions(self, state: BimaruState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
+        
         def matching_rows(row1, row2): 
             new_board= np.where(row1 != row2, row1 + row2, row1)
             if np.array_equal(new_board, row1): return False
@@ -226,9 +232,6 @@ class Bimaru(Problem):
             return count_different <= 0
         
         if state.ships[3] != self.expected_ships[3]:
-            #return self.first_options[4]
-    
-
             options = []
             for row_or_col in range(10):
                 # Horizontals
@@ -244,7 +247,7 @@ class Bimaru(Problem):
                             Bimaru.fill_water_around_ship(option_for_board)
                             if Board.match_boards(board, option_for_board):
                                 options.append(option_for_board)
-            # Verticals
+                # Verticals
                 if board.col_number[row_or_col] >= 4:
                     for i in range(7):
                         test_row = np.zeros((1, 10))
@@ -370,6 +373,36 @@ class Bimaru(Problem):
                         if board.board[row][two_left] == 1: board.board[row][col - 1] = 8
                         elif board.board[row][two_left] == 8: board.board[row][col - 1] = 32
                     else: board.board[row][col - 1] == 8
+        
+        # Terminal Columns
+        for col in range(1, 9):
+            left_col_left = np.sum(board.board[:, col - 1] == 8)
+            right_col_right = np.sum(board.board[:, col + 1] == 16)
+            if left_col_left + right_col_right == board.col_number[col]:
+                lista = []
+                for i in range(10):
+                    if board.board[i][col - 1] == 8 or board.board[i][col + 1] == 16: 
+                        lista.append(board.board[i][col])
+                    else: 
+                        lista.append(1)
+                board.board[:, col] = lista
+        
+        
+        
+        # Terminal Rows
+        for row in range(1, 9):
+            top_row_top = np.sum(board.board[row - 1] == 2)
+            bottom_row_bottom = np.sum(board.board[row + 1] == 4)
+            if top_row_top + bottom_row_bottom == board.row_number[row]:
+                lista = []
+                for i in range(10):
+                    if board.board[row - 1][i] == 2 or board.board[row + 1][i] == 4: 
+                        lista.append(board.board[row][i])
+                    else: 
+                        lista.append(1)
+                board.board[row] = lista
+        
+
         
         Bimaru.fill_water_around_ship(board)
         Bimaru.fill_water(board)
@@ -538,7 +571,6 @@ class Bimaru(Problem):
                             if Board.match_boards(board, option_for_board):
                                 options[ship_length].append(option_for_board)
             # Verticals
-            #for ship_length in ship_lengths_vertical:
                 if board.col_number[row_or_col] >= ship_length:
                     for i in range(11 - ship_length):
                         test_row = np.zeros((1, 10))
@@ -563,6 +595,7 @@ class Bimaru(Problem):
 if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
+    
     if len(problem.initial.board.hints) > 2:
         goal_node = depth_first_tree_search(problem)
     else:
