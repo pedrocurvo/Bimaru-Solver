@@ -214,6 +214,7 @@ class Bimaru(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         Bimaru.initial_fill(board)
+
         
         self.initial = BimaruState(board)
         self.expected_ships = np.array([4, 3, 2, 1])
@@ -336,71 +337,97 @@ class Bimaru(Problem):
     @staticmethod
     def initial_fill(board: Board):
         """Preenche com água as linhas e colunas que não contêm barcos."""
+        # Fill rows and cols with no ships
         row_coordinates = np.argwhere(board.row_number == 0)
         col_coordinates = np.argwhere(board.col_number == 0)
         for coordinate in row_coordinates: board.board[coordinate[0]] = [1 for _ in range(10)]
         for coordinate in col_coordinates: board.board[:, coordinate[0]] = [1 for _ in range(10)]
+
+        # Fill Waters around ships
         Bimaru.fill_water_around_ship(board)
+
+        # Fill rows and cols with all pieces
         Bimaru.fill_water(board)
+        
         # Terminal Pieces
         for row in range(10):
             for col in range(10):
                 # Terminal T's
-                if board.board[row][col] == 2:
+                if board.board[row, col] == 2:
                     two_below = row + 2
                     if two_below < 10:
-                        if board.board[two_below][col] == 1: board.board[row + 1][col] = 4
-                        elif board.board[two_below][col] == 4: board.board[row + 1][col] = 32
-                    else: board.board[row + 1][col] == 4
+                        if board.board[two_below, col] == 1:
+                            board.board[row + 1][col] = 4 # t _ w -> t b w
+                        elif board.board[two_below][col] == 4:
+                            board.board[row + 1][col] = 32 # t _ b -> t m b
+                        elif two_below + 1 < 10 and board.board[two_below][col] == 32:
+                            board.board[row + 1][col] = 32 # t _ m _ -> t m m _
+                            board.board[row + 2][col] = 4 # t m m _ -> t m m b
+                    else:
+                        board.board[row + 1][col] = 4 # t _ |  -> t b |
                 # Terminal B's
                 elif board.board[row][col] == 4:
                     two_above = row - 2
                     if two_above >= 0:
-                        if board.board[two_above][col] == 1: board.board[row - 1][col] = 2
-                        elif board.board[two_above][col] == 2: board.board[row - 1][col] = 32
-                    else: board.board[row - 1][col] == 2
+                        if board.board[two_above][col] == 1:
+                            board.board[row - 1][col] = 2 # b _ w -> b t w
+                        elif board.board[two_above][col] == 2:
+                            board.board[row - 1][col] = 32 # b _ t -> b m t
+                        elif two_above - 1 >= 0 and board.board[two_above][col] == 32:
+                            board.board[row - 1][col] = 32 # b _ m _ -> b m m _
+                            board.board[row - 2][col] = 2 # b m m _ -> b m m t
+                    else:
+                        board.board[row - 1][col] = 2 # b _ |  -> b t |
                 # Terminal L's
                 elif board.board[row][col] == 8:
                     two_right = col + 2
                     if two_right < 10:
-                        if board.board[row][two_right] == 1: board.board[row][col + 1] = 16
-                        elif board.board[row][two_right] == 16: board.board[row][col + 1] = 32
-                    else: board.board[row][col + 1] == 16
+                        if board.board[row][two_right] == 1:
+                            board.board[row][col + 1] = 16 # l _ w -> l r w
+                        elif board.board[row][two_right] == 16:
+                            board.board[row][col + 1] = 32 # l _ r -> l m r
+                        elif two_right + 1 < 10 and board.board[row][two_right] == 32:
+                            board.board[row][col + 1] = 32 # l _ m _ -> l m m _
+                            board.board[row][col + 2] = 16 # l m m _ -> l m m r
+                    else:
+                        board.board[row][col + 1] = 16 # l _ |  -> l r |
                 # Terminal R's
                 elif board.board[row][col] == 16:
                     two_left = col - 2
                     if two_left >= 0:
-                        if board.board[row][two_left] == 1: board.board[row][col - 1] = 8
-                        elif board.board[row][two_left] == 8: board.board[row][col - 1] = 32
-                    else: board.board[row][col - 1] == 8
+                        if board.board[row][two_left] == 1:
+                            board.board[row][col - 1] = 8 # r _ w -> r l w
+                        elif board.board[row][two_left] == 8:
+                            board.board[row][col - 1] = 32 # r _ l -> r m l
+                        elif two_left - 1 >= 0 and board.board[row][two_left] == 32:
+                            board.board[row][col - 1] = 32 # r _ m _ -> r m m _
+                            board.board[row][col - 2] = 8 # r m m _ -> r m m l
+                    else:
+                        board.board[row][col - 1] = 8 # r _ |  -> r l |
+                # Terminal M's
+                # TODO 
         
         # Terminal Columns
-        for col in range(1, 9):
-            left_col_left = np.sum(board.board[:, col - 1] == 8)
-            right_col_right = np.sum(board.board[:, col + 1] == 16)
-            if left_col_left + right_col_right == board.col_number[col]:
-                lista = []
-                for i in range(10):
-                    if board.board[i][col - 1] == 8 or board.board[i][col + 1] == 16: 
-                        lista.append(board.board[i][col])
-                    else: 
-                        lista.append(1)
-                board.board[:, col] = lista
-        
-        
+        for col in range(1, 9): 
+            matriz = np.where(board.board[:, col - 1] == 8, 1, 0)                           # l _ _ _ _ -> 1 0 0 0 0
+            matriz = np.where(np.isin(board.board[:, col], [2, 4, 8, 16, 32]), 1, matriz)   # _ _ c _ _ -> 0 0 1 0 0 -> 1 0 1 0 0
+            matriz = np.where(board.board[:, col + 1] == 16, 1, matriz)                     # _ _ _ _ r -> 0 1 0 0 1 -> 1 0 1 0 1
+            valor = np.sum(matriz) # 1 0 1 0 1 -> 3 
+            # TODO: if we have a top or a bottom in the col
+
+            if valor == board.col_number[col]:
+                board.board[:, col] = np.where(matriz == 1, board.board[:, col], 1)
+
         
         # Terminal Rows
         for row in range(1, 9):
-            top_row_top = np.sum(board.board[row - 1] == 2)
-            bottom_row_bottom = np.sum(board.board[row + 1] == 4)
-            if top_row_top + bottom_row_bottom == board.row_number[row]:
-                lista = []
-                for i in range(10):
-                    if board.board[row - 1][i] == 2 or board.board[row + 1][i] == 4: 
-                        lista.append(board.board[row][i])
-                    else: 
-                        lista.append(1)
-                board.board[row] = lista
+            matriz = np.where(board.board[row - 1] == 2, 1, 0)                          # t _ _ _ _ -> 1 0 0 0 0
+            matriz = np.where(np.isin(board.board[row], [2, 4, 8, 16, 32]), 1, matriz)  # _ _ _ _ c -> 0 0 0 0 1 -> 1 0 0 0 1
+            matriz = np.where(board.board[row + 1] == 4, 1, matriz)                     # _ _ b _ _ -> 0 0 1 0 0 -> 1 0 1 0 1
+            valor = np.sum(matriz) # 1 0 1 0 1 -> 3
+            # TODO: if we have a left or right in the row 
+            if valor == board.row_number[row]: # 3 == 3
+                board.board[row] = np.where(matriz == 1, board.board[row], 1) 
         
 
         
@@ -581,7 +608,7 @@ class Bimaru(Problem):
                             option_for_board = Board(np.zeros((10, 10)))
                             option_for_board.board[:, row_or_col] = test_row[0]
                             option_for_board.ships[ship_length - 1] += 1
-                            Bimaru.fill_water_around_ship(option_for_board, activate_dual = True, horizontal=False)
+                            Bimaru.fill_water_around_ship(option_for_board, activate_dual = True, horizontal= False)
                             if Board.match_boards(board, option_for_board):
                                 options[ship_length].append(option_for_board)
         #for ship_length in range(2, 4):

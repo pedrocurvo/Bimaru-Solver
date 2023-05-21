@@ -5,8 +5,8 @@ import time
 arr = np.array([2, 3, 2, 4, 2, 1, 2, 3])
 
 # Count the occurrences of a specific element
-count = np.sum(arr == 2)
-print(count)  # Output: 4
+arr = np.where(np.isin(arr, [2, 3]), 1, arr)
+print(arr)  # Output: 4
 
 
 
