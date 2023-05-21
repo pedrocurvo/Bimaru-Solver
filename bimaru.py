@@ -368,9 +368,6 @@ class Bimaru(Problem):
         Bimaru.fill_water_around_ship(board)
         Bimaru.fill_water(board)
                 
-                
-                
-
 
     @staticmethod
     def fill_water_around_ship(board: Board):
@@ -381,68 +378,6 @@ class Bimaru(Problem):
         Bimaru.fill_around_b(board)
         Bimaru.fill_around_l(board)
         Bimaru.fill_around_r(board)
-        return
-        # Find Pieces
-        coordinates_c = np.argwhere(board.board == 64)
-        coordinates_m = np.argwhere(board.board == 32)
-        coordinates_t = np.argwhere(board.board == 2)
-        coordinates_b = np.argwhere(board.board == 4)
-        coordinates_l = np.argwhere(board.board == 8)
-        coordinates_r = np.argwhere(board.board == 16)
-
-        # Fill around C
-        for coordinate in coordinates_c:
-            row, col = coordinate[0], coordinate[1]
-            r_min, r_max = max(0, row - 1), min(10, row + 2)
-            c_min, c_max = max(0, col - 1), min(10, col + 2)
-            board.board[r_min:r_max, c_min:c_max] = np.where(board.board[r_min:r_max, c_min:c_max] != 64, 1, board.board[r_min:r_max, c_min:c_max])
-
-        # Fill around B
-        for coordinate in coordinates_b:
-            row, col = coordinate[0], coordinate[1]
-            row_range = range(max(0, row - 2), min(10, row + 2))
-            col_range = range(max(0, col - 1), min(10, col + 2))
-            for i, j in itertools.product(row_range, col_range):
-                if (board.board[i, j] != 4 and j != col or i > row): board.board[i, j] = 1 #w
-
-        # Fill around T
-        for coordinate in coordinates_t:
-            row, col = coordinate[0], coordinate[1]
-            row_range = range(max(0, row - 1), min(10, row + 3))
-            col_range = range(max(0, col - 1), min(10, col + 2))
-            for i, j in itertools.product(row_range, col_range):
-                if (board.board[i, j] != 2 and j != col or i < row): board.board[i, j] = 1 #w
-        
-        
-        # Fill around L
-        for coordinate in coordinates_l:
-            row = coordinate[0]
-            col = coordinate[1]
-            row_range = range(max(0, row - 1), min(10, row + 2))
-            col_range = range(max(0, col - 1), min(10, col + 3))
-            for i, j in itertools.product(row_range, col_range):
-                if (board.board[i, j] != 8 and i != row or j < col): board.board[i, j] = 1 #w
-        # Fill around R
-        for coordinate in coordinates_r:
-            row = coordinate[0]
-            col = coordinate[1]
-            row_range = range(max(0, row - 1), min(10, row + 2))
-            col_range = range(max(0, col - 2), min(10, col + 2))
-            for i, j in itertools.product(row_range, col_range):
-                if (board.board[i, j] != 16 and i != row or j > col): board.board[i, j] = 1 #w
-        # Fill around M
-        for coordinate in coordinates_m:
-            row, col = coordinate[0], coordinate[1]
-            row_range = range(max(0, row - 1), min(10, row + 2))
-            col_range = range(max(0, col - 1), min(10, col + 2))
-            for i, j in itertools.product(row_range, col_range):
-                if j != col and i != row: board.board[i, j] = 1 #w
-
-            # Terminal M
-            if row == 0: board.board[row + 1, col] = 1
-            elif row == 9: board.board[row - 1, col] = 1
-            if col == 0: board.board[row, col + 1] = 1
-            elif col == 9: board.board[row, col - 1] = 1
 
     
     @staticmethod
@@ -732,7 +667,9 @@ class Bimaru(Problem):
             valor = np.sum(matriz) # 1 0 1 0 1 -> 3
             # TODO: if we have a left or right in the row 
             if valor == board.row_number[row]: # 3 == 3
-                board.board[row] = np.where(matriz == 1, board.board[row], 1) 
+                board.board[row] = np.where(matriz == 1, board.board[row], 1)   # t 1 _ _ _ _ _ _ _ _
+                                                                                # _ 1 1 _ 1 c 1 _ _ _  -> _ 1 1 _ 1 c 1 1 1 1 
+                                                                                # _ 1 1 b 1 1 1 _ _ _
 
 
     @staticmethod
