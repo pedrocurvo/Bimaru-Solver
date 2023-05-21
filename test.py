@@ -1,10 +1,9 @@
 import numpy as np
-
-# Create a matrix
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
-
-# Print the submatrix
-print(matrix[1, 2])
+np_board = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+test_row = np.zeros((1, 10))
+positions = np.arange(7)[:, np.newaxis] + np.arange(4)
+test_row[0, positions] = [2, 32, 32, 4]
+print(test_row)
+matching_indices = np.where(np.all(np_board[0][positions] == test_row, axis=1))[0]
+print(matching_indices)
 
