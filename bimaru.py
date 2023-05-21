@@ -207,9 +207,8 @@ class Bimaru(Problem):
 
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
-        Bimaru.fill_water_rows_cols(board)
-        Bimaru.fill_water_around_ship(board)
-        Bimaru.fill_water(board)
+        Bimaru.initial_fill(board)
+        
         self.initial = BimaruState(board)
         self.expected_ships = np.array([4, 3, 2, 1])
         self.first_options = Bimaru.create_all_first_options(board)
@@ -332,14 +331,51 @@ class Bimaru(Problem):
         return 10 - value 
 
     @staticmethod
-    def fill_water_rows_cols(board: Board):
+    def initial_fill(board: Board):
         """Preenche com água as linhas e colunas que não contêm barcos."""
         row_coordinates = np.argwhere(board.row_number == 0)
         col_coordinates = np.argwhere(board.col_number == 0)
-        for coordinate in row_coordinates:
-            board.board[coordinate[0]] = [1 for _ in range(10)]
-        for coordinate in col_coordinates:
-            board.board[:, coordinate[0]] = [1 for _ in range(10)]
+        for coordinate in row_coordinates: board.board[coordinate[0]] = [1 for _ in range(10)]
+        for coordinate in col_coordinates: board.board[:, coordinate[0]] = [1 for _ in range(10)]
+        Bimaru.fill_water_around_ship(board)
+        Bimaru.fill_water(board)
+        # Terminal Pieces
+        for row in range(10):
+            for col in range(10):
+                # Terminal T's
+                if board.board[row][col] == 2:
+                    two_below = row + 2
+                    if two_below < 10:
+                        if board.board[two_below][col] == 1: board.board[row + 1][col] = 4
+                        elif board.board[two_below][col] == 4: board.board[row + 1][col] = 32
+                    else: board.board[row + 1][col] == 4
+                # Terminal B's
+                elif board.board[row][col] == 4:
+                    two_above = row - 2
+                    if two_above >= 0:
+                        if board.board[two_above][col] == 1: board.board[row - 1][col] = 2
+                        elif board.board[two_above][col] == 2: board.board[row - 1][col] = 32
+                    else: board.board[row - 1][col] == 2
+                # Terminal L's
+                elif board.board[row][col] == 8:
+                    two_right = col + 2
+                    if two_right < 10:
+                        if board.board[row][two_right] == 1: board.board[row][col + 1] = 16
+                        elif board.board[row][two_right] == 16: board.board[row][col + 1] = 32
+                    else: board.board[row][col + 1] == 16
+                # Terminal R's
+                elif board.board[row][col] == 16:
+                    two_left = col - 2
+                    if two_left >= 0:
+                        if board.board[row][two_left] == 1: board.board[row][col - 1] = 8
+                        elif board.board[row][two_left] == 8: board.board[row][col - 1] = 32
+                    else: board.board[row][col - 1] == 8
+        
+        Bimaru.fill_water_around_ship(board)
+        Bimaru.fill_water(board)
+                
+                
+                
 
 
     @staticmethod
@@ -498,7 +534,7 @@ class Bimaru(Problem):
                             option_for_board = Board(np.zeros((10, 10)))
                             option_for_board.board[row_or_col] = test_row[0]
                             option_for_board.ships[ship_length - 1] += 1
-                            Bimaru.fill_water_around_ship(option_for_board, activate_dual = ship_length == 2, vertical=False)
+                            Bimaru.fill_water_around_ship(option_for_board, activate_dual = True, vertical=False)
                             if Board.match_boards(board, option_for_board):
                                 options[ship_length].append(option_for_board)
             # Verticals
@@ -513,7 +549,7 @@ class Bimaru(Problem):
                             option_for_board = Board(np.zeros((10, 10)))
                             option_for_board.board[:, row_or_col] = test_row[0]
                             option_for_board.ships[ship_length - 1] += 1
-                            Bimaru.fill_water_around_ship(option_for_board, activate_dual = ship_length == 2, horizontal=False)
+                            Bimaru.fill_water_around_ship(option_for_board, activate_dual = True, horizontal=False)
                             if Board.match_boards(board, option_for_board):
                                 options[ship_length].append(option_for_board)
         #for ship_length in range(2, 4):
