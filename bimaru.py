@@ -59,6 +59,9 @@ class Board:
         new_board= np.where(self.board != other.board, self.board + other.board, self.board)
         return Board(new_board, self.col_number, self.row_number)
 
+    def __getitem__(self, x):
+        return self.board[x]
+
 
     def get_value(self, row: int, col: int) -> str:
         """Devolve o valor na respetiva posição do tabuleiro."""
@@ -200,6 +203,11 @@ class Board:
 
 
 class Bimaru(Problem):
+    """ Class that represents the Bimaru Problem.
+
+        Attributes:
+        probabilistic_grid: A numpy array representing the probabilistic grid for ship placement. 
+    """
     probabilistic_grid = np.array([
             [8.0, 11.5, 14.3, 15.9, 16.7, 16.7, 15.9, 14.3, 11.5, 8.0],
             [11.5, 14.3, 16.6, 17.8, 18.4, 18.4, 17.8, 16.6, 14.3, 11.5],
@@ -217,10 +225,8 @@ class Bimaru(Problem):
 
 
     def __init__(self, board: Board):
-        """O construtor especifica o estado inicial."""
+        """Creates the Initial State of the problem"""
         Bimaru.initial_fill(board)
-
-        
         self.initial = BimaruState(board)
         self.expected_ships = np.array([4, 3, 2, 1])
         self.first_options = Bimaru.create_all_first_options(board)
@@ -228,8 +234,9 @@ class Bimaru(Problem):
 
     
     def actions(self, state: BimaruState):
-        """Retorna uma lista de ações que podem ser executadas a
-        partir do estado passado como argumento."""
+        """It returns a list of actions for the given state. For the 1 and 4 lenght ship the actions are created here,
+        since they are few. For the other ships, the actions are created in the creation of the self object, allowing
+        for a faster execution. The only thing necessary for that intermidiate ship length is the boards match."""
         
         def matching_rows(row1, row2): 
             new_board= np.where(row1 != row2, row1 + row2, row1)
@@ -255,8 +262,6 @@ class Bimaru(Problem):
                             #Bimaru.fill_water_around_ship(option_for_board)
                             if Board.match_boards(board, option_for_board):
                                 options.append(option_for_board)
-            #for option in options:
-                #print(option.board)
                 # Verticals
                 if board.col_number[row_or_col] >= 4:
                     for i in range(7):
@@ -307,10 +312,9 @@ class Bimaru(Problem):
         
 
     def result(self, state: BimaruState, action):
-        """Retorna o estado resultante de executar a 'action' sobre
-        'state' passado como argumento. A ação a executar deve ser uma
-        das presentes na lista obtida pela execução de
-        self.actions(state)."""
+        """Joins the action and the state. It adds the action board with the state board and then fills the water
+        for the columns that have the maximum number of pieces in that row or column. Depending on the action, it
+        also adds the ship of the action to the state ships, allowing for a faster execution."""
         new_board = state.board + action
         Bimaru.fill_water(new_board)
         new_state = BimaruState(new_board)
@@ -319,9 +323,8 @@ class Bimaru(Problem):
 
 
     def goal_test(self, state: BimaruState):
-        """Retorna True se e só se o estado passado como argumento é
-        um estado objetivo. Deve verificar se todas as posições do tabuleiro
-        estão preenchidas de acordo com as regras do problema."""
+        """Returns True if the state is a goal. It only needs to check if the number of ships is correct, since
+        the actions created by the actions function are already valid boards. It allows for a faster execution."""
         return np.array_equal(state.ships, self.expected_ships)
 
     def h(self, node: Node):
@@ -694,11 +697,10 @@ class Bimaru(Problem):
     def terminal_cols(board: Board):
         # Terminal Columns
         for col in range(1, 9): 
-            matriz = np.where(board.board[:, col - 1] == 8, 1, 0)                           # l _ _ _ _ -> 1 0 0 0 0
+            matriz = np.where(board.board[:, col - 1] == 8, 1, 0)                               # l _ _ _ _ -> 1 0 0 0 0
             matriz = np.where(np.isin(board.board[:, col], [2, 4, 8, 16, 32, 64]), 1, matriz)   # _ _ c _ _ -> 0 0 1 0 0 -> 1 0 1 0 0
             matriz = np.where(board.board[:, col + 1] == 16, 1, matriz)
             valor = np.sum(matriz) # 1 0 1 0 1 -> 3 
-            # TODO: if we have a top or a bottom in the col
 
             if valor == board.col_number[col]:
                 board.board[:, col] = np.where(matriz == 1, board.board[:, col], 1)
@@ -730,11 +732,7 @@ class Bimaru(Problem):
                         board.board[row][i : i + 2] = [8, 16]
                         Bimaru.fill_around_l(board, True, row, i)
                         Bimaru.fill_around_r(board, True, row, i + 1)
-                
-                    
 
-        
-        
         for col in range(10):
             empty = np.count_nonzero(board.board[:, col] == 0)
             pieces = empty + np.count_nonzero(board.board[:, col] == 1)
