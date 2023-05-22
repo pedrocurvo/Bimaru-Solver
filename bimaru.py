@@ -53,10 +53,10 @@ class Board:
         self.col_number = col_number
         self.row_number = row_number
         self.ships = np.array([0, 0, 0, 0])
-    
+
     def __add__(self, other):
         """Soma de dois tabuleiros."""
-        new_board= np.where(self.board != other.board, self.board + other.board, self.board)
+        new_board = np.where(self.board != other.board, self.board + other.board, self.board)
         return Board(new_board, self.col_number, self.row_number)
 
     def __getitem__(self, x):
@@ -138,17 +138,20 @@ class Board:
     def match_boards(board1, board2):
         """Verifies if two boards match."""
         test_board = board1 + board2
-        if np.array_equal(test_board.board, board1.board): return False #garante que os dois tabuleiros são diferentes ou que o board1 não contem já o board2
+        if np.array_equal(test_board.board, board1.board):
+            return False  # garante que os dois tabuleiros são diferentes ou que o board1 não contem já o board2
 
         # Check the number of ships per column and row
         matrix = np.where((test_board.board != 0) & (test_board.board != 1), 1, 0)
         col_compare = matrix.sum(axis=0)
         row_compare = matrix.sum(axis=1)
 
-        if np.any(col_compare > board1.col_number) or np.any(row_compare > board1.row_number): return False
+        if np.any(col_compare > board1.col_number) or np.any(row_compare > board1.row_number):
+            return False
 
         count_different = np.count_nonzero(~np.isin(test_board.board, [0, 1, 2, 4, 8, 16, 32, 64]))
-        if count_different: return False #garante que os valores do tabuleiro são válidos
+        if count_different: 
+            return False # garante que os valores do tabuleiro são válidos
 
         # Check below above special conditions
         for i in range(10):
@@ -157,10 +160,10 @@ class Board:
 
 
         # Other conditions
-        coordinate_t = np.argwhere(board1.board == 2) #t
-        coordinate_b = np.argwhere(board1.board == 4) #b
-        coordinate_l = np.argwhere(board1.board == 8) #l
-        coordinate_r = np.argwhere(board1.board == 16) #r
+        coordinate_t = np.argwhere(board1.board == 2) # t
+        coordinate_b = np.argwhere(board1.board == 4) # b
+        coordinate_l = np.argwhere(board1.board == 8) # l
+        coordinate_r = np.argwhere(board1.board == 16) # r
         for coordinate in coordinate_t:
             if coordinate[0] < 7 and board2.board[coordinate[0] + 1, coordinate[1]] == 1: return False
         for coordinate in coordinate_b:
@@ -220,7 +223,6 @@ class Bimaru(Problem):
             [11.5, 14.3, 16.6, 17.8, 18.4, 18.4, 17.8, 16.6, 14.3, 11.5],
             [8.0, 11.5, 14.3, 15.9, 16.7, 16.7, 15.9, 14.3, 11.5, 8.0],
             ])
-   # normalization = np.sum(probabilistic_grid)
     
 
 
@@ -278,10 +280,6 @@ class Bimaru(Problem):
                                 options.append(option_for_board)
             return options
 
-
-
-
-            
         if state.ships[2] != self.expected_ships[2]:
             return [
                 option
@@ -289,14 +287,12 @@ class Bimaru(Problem):
                 if Board.match_boards(state.board, option)
             ]
         
-    
         if state.ships[1] != self.expected_ships[1]:
             return [
                 option
                 for option in self.first_options[2]
                 if Board.match_boards(state.board, option)
             ]
-            
 
         if state.ships[0] != self.expected_ships[0]:
             options = []
@@ -378,8 +374,7 @@ class Bimaru(Problem):
         Bimaru.terminal_b(board)
         Bimaru.terminal_l(board)
         Bimaru.terminal_r(board)
-        
-        
+
         # Terminal Columns
         Bimaru.terminal_cols(board)
         Bimaru.terminal_rows(board)
@@ -510,7 +505,7 @@ class Bimaru(Problem):
 
 
     @staticmethod
-    def fill_around_c(board: Board, coordinates = False, x = None, y = None):
+    def fill_around_c(board: Board, coordinates = False, x=None, y=None):
         # Find Pieces
         coordinates_c = [(x, y)] if coordinates else np.argwhere(board.board == 64)
         for coordinate in coordinates_c:
@@ -521,7 +516,7 @@ class Bimaru(Problem):
 
 
     @staticmethod
-    def fill_around_t(board: Board, coordinates = False, x = None, y = None):
+    def fill_around_t(board: Board, coordinates=False, x=None, y=None):
         # Fill around T
         coordinates_t = [(x, y)] if coordinates else np.argwhere(board.board == 2)
         for coordinate in coordinates_t:
@@ -533,7 +528,7 @@ class Bimaru(Problem):
 
 
     @staticmethod
-    def fill_around_b(board: Board, coordinates = False, x = None, y = None):
+    def fill_around_b(board: Board, coordinates=False, x=None, y=None):
         coordinates_b = [(x, y)] if coordinates else np.argwhere(board.board == 4)
         for coordinate in coordinates_b:
                 row, col = coordinate[0], coordinate[1]
@@ -544,7 +539,7 @@ class Bimaru(Problem):
 
 
     @staticmethod
-    def fill_around_l(board: Board, coordinates = False, x = None, y = None):
+    def fill_around_l(board: Board, coordinates=False, x=None, y=None):
         coordinates_l = [(x, y)] if coordinates else np.argwhere(board.board == 8)
         # Fill around L
         for coordinate in coordinates_l:
@@ -700,7 +695,7 @@ class Bimaru(Problem):
             matriz = np.where(board.board[:, col - 1] == 8, 1, 0)                               # l _ _ _ _ -> 1 0 0 0 0
             matriz = np.where(np.isin(board.board[:, col], [2, 4, 8, 16, 32, 64]), 1, matriz)   # _ _ c _ _ -> 0 0 1 0 0 -> 1 0 1 0 0
             matriz = np.where(board.board[:, col + 1] == 16, 1, matriz)
-            valor = np.sum(matriz) # 1 0 1 0 1 -> 3 
+            valor = np.sum(matriz)  # 1 0 1 0 1 -> 3
 
             if valor == board.col_number[col]:
                 board.board[:, col] = np.where(matriz == 1, board.board[:, col], 1)
@@ -708,28 +703,28 @@ class Bimaru(Problem):
 
     @staticmethod
     def perfect_spaces(board: Board):
-        
+
         for row in range(10):
             empty = np.count_nonzero(board.board[row] == 0)
             pieces = empty + np.count_nonzero(board.board[row] == 1)
             if empty == board.row_number[row] and pieces == 0:
                 for i in range(7):
-                    if np.array_equal(board.board[row][i : i + 4], [0, 0, 0, 0]):
+                    if np.array_equal(board.board[row][i: i + 4], [0, 0, 0, 0]):
                         print(empty, board.row_number[row])
                         print(board.board[row])
-                        board.board[row][i : i + 4] = [8, 32, 32, 16]
+                        board.board[row][i: i + 4] = [8, 32, 32, 16]
                         Bimaru.fill_around_l(board, True, row, i)
                         Bimaru.fill_around_r(board, True, row, i + 3)
                         print(board.board)
                         break
                 for i in range(8):
-                    if np.array_equal(board.board[row][i:i + 3], np.array([0, 0, 0])):
-                        board.board[row][i : i + 3] = [8, 32, 16]
+                    if np.array_equal(board.board[row][i: i + 3], np.array([0, 0, 0])):
+                        board.board[row][i: i + 3] = [8, 32, 16]
                         Bimaru.fill_around_l(board, True, row, i)
                         Bimaru.fill_around_r(board, True, row, i + 2)
                 for i in range(9):
                     if np.array_equal(board.board[row][i:i + 2], np.array([0, 0])):
-                        board.board[row][i : i + 2] = [8, 16]
+                        board.board[row][i: i + 2] = [8, 16]
                         Bimaru.fill_around_l(board, True, row, i)
                         Bimaru.fill_around_r(board, True, row, i + 1)
 
@@ -738,22 +733,22 @@ class Bimaru(Problem):
             pieces = empty + np.count_nonzero(board.board[:, col] == 1)
             if empty == board.col_number[col] and pieces == 0:
                 for i in range(7):
-                    if np.array_equal(board.board[:, col][i:i + 4], np.array([0, 0, 0, 0])):
-                        board.board[:, col][i : i + 4] = [2, 32, 32, 4]
+                    if np.array_equal(board.board[:, col][i: i + 4], np.array([0, 0, 0, 0])):
+                        board.board[:, col][i: i + 4] = [2, 32, 32, 4]
                         Bimaru.fill_around_t(board, True, i, col)
                         Bimaru.fill_around_b(board, True, i + 3, col)
                         break
                 for i in range(8):
-                    if np.array_equal(board.board[:, col][i:i + 3], np.array([0, 0, 0])):
-                        board.board[:, col][i : i + 3] = [2, 32, 4]
+                    if np.array_equal(board.board[:, col][i: i + 3], np.array([0, 0, 0])):
+                        board.board[:, col][i: i + 3] = [2, 32, 4]
                         Bimaru.fill_around_t(board, True, i, col)
                         Bimaru.fill_around_b(board, True, i + 2, col)
                 for i in range(9):
-                    if np.array_equal(board.board[:, col][i:i + 2], np.array([0, 0])):
-                        board.board[:, col][i : i + 2] = [2, 4]
+                    if np.array_equal(board.board[:, col][i: i + 2], np.array([0, 0])):
+                        board.board[:, col][i: i + 2] = [2, 4]
                         Bimaru.fill_around_t(board, True, i, col)
-        
-        
+
+
 
 
 
@@ -769,6 +764,4 @@ if __name__ == "__main__":
     else:
         goal_node = astar_search(problem)
     '''
-    
-
     goal_node.state.print()
