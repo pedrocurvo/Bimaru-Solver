@@ -367,6 +367,9 @@ class Bimaru(Problem):
         # Fill Waters around ships
         Bimaru.fill_water_around_ship(board)
         Bimaru.fill_water(board)
+        #Bimaru.perfect_spaces(board)
+        #Bimaru.fill_water(board)
+
                 
 
     @staticmethod
@@ -574,11 +577,25 @@ class Bimaru(Problem):
             for i, j in itertools.product(row_range, col_range):
                 if j != col and i != row: board.board[i, j] = 1 #w
 
-            # Terminal M
-            if row == 0: board.board[row + 1, col] = 1
-            elif row == 9: board.board[row - 1, col] = 1
-            if col == 0: board.board[row, col + 1] = 1
-            elif col == 9: board.board[row, col - 1] = 1
+            if row in [0, 9]:
+                x = 1 if row == 0 else -1
+                board.board[row + x, col] = 1
+                if col == 1:
+                    board.board[row, col - 1] = 8 # | _ m _ _ -> | l m _ _
+                    if board.board[row, col + 2] == 1: board.board[row, col + 1] = 16 # | l m _ _ -> | l m r _
+
+                elif col == 8:
+                    board.board[row, col + 1] = 16 # _ _ m _ | -> # _ _ m r
+                    if board.board[row, col - 2] == 1: board.board[row, col - 1] = 8 # w _ m _ | -> # w l m r
+            if col in [0, 9]:
+                x = 1 if col == 0 else -1
+                board.board[row, col + x] = 1 
+                if row == 1:
+                    board.board[row - 1, col] = 2 # _ m _ _ -> t m _ _
+                    if board.board[row + 2, col] == 1: board.board[row + 1, col] = 4 # _ m _ w -> t m b w
+                elif row == 8:
+                    board.board[row + 1, col] = 4 # _ m _ _ -> b m _ _
+                    if board.board[row - 2, col] == 1: board.board[row - 1, col] = 2 # _ m _ w _ -> t m b w
 
 
     @staticmethod
@@ -662,7 +679,7 @@ class Bimaru(Problem):
         # Terminal Rows
         for row in range(1, 9):
             matriz = np.where(board.board[row - 1] == 2, 1, 0)                          # t _ _ _ _ -> 1 0 0 0 0
-            matriz = np.where(np.isin(board.board[row], [2, 4, 8, 16, 32]), 1, matriz)  # _ _ _ _ c -> 0 0 0 0 1 -> 1 0 0 0 1
+            matriz = np.where(np.isin(board.board[row], [2, 4, 8, 16, 32, 64]), 1, matriz)  # _ _ _ _ c -> 0 0 0 0 1 -> 1 0 0 0 1
             matriz = np.where(board.board[row + 1] == 4, 1, matriz)                     # _ _ b _ _ -> 0 0 1 0 0 -> 1 0 1 0 1
             valor = np.sum(matriz) # 1 0 1 0 1 -> 3
             # TODO: if we have a left or right in the row 
@@ -677,8 +694,8 @@ class Bimaru(Problem):
         # Terminal Columns
         for col in range(1, 9): 
             matriz = np.where(board.board[:, col - 1] == 8, 1, 0)                           # l _ _ _ _ -> 1 0 0 0 0
-            matriz = np.where(np.isin(board.board[:, col], [2, 4, 8, 16, 32]), 1, matriz)   # _ _ c _ _ -> 0 0 1 0 0 -> 1 0 1 0 0
-            matriz = np.where(board.board[:, col + 1] == 16, 1, matriz)                     # _ _ _ _ r -> 0 1 0 0 1 -> 1 0 1 0 1
+            matriz = np.where(np.isin(board.board[:, col], [2, 4, 8, 16, 32, 64]), 1, matriz)   # _ _ c _ _ -> 0 0 1 0 0 -> 1 0 1 0 0
+            matriz = np.where(board.board[:, col + 1] == 16, 1, matriz)
             valor = np.sum(matriz) # 1 0 1 0 1 -> 3 
             # TODO: if we have a top or a bottom in the col
 
@@ -686,6 +703,58 @@ class Bimaru(Problem):
                 board.board[:, col] = np.where(matriz == 1, board.board[:, col], 1)
 
 
+    @staticmethod
+    def perfect_spaces(board: Board):
+        
+        for row in range(10):
+            empty = np.count_nonzero(board.board[row] == 0)
+            if empty != 0:
+                other_pieces = 10 - np.count_nonzero(board.board[row] == 1) - empty 
+                if other_pieces == 0 and empty == board.row_number[row]:
+                    for i in range(7):
+                        if np.array_equal(board.board[row][i:i + 4], np.array([0, 0, 0, 0])):
+                            print(board.board[row][i:i + 4])
+                            board.board[row][i : i + 4] = [8, 32, 32, 16]
+
+                            Bimaru.fill_around_l(board, True, row, i)
+                            Bimaru.fill_around_r(board, True, row, i + 3)
+                            break
+                    
+                    for i in range(8):
+                        if np.array_equal(board.board[row][i:i + 3], np.array([0, 0, 0])):
+                            board.board[row][i : i + 3] = [8, 32, 16]
+                            Bimaru.fill_around_l(board, True, row, i)
+                            Bimaru.fill_around_r(board, True, row, i + 2)
+                    for i in range(9):
+                        if np.array_equal(board.board[row][i:i + 2], np.array([0, 0])):
+                            board.board[row][i : i + 2] = [8, 16]
+                            Bimaru.fill_around_l(board, True, row, i)
+                            Bimaru.fill_around_r(board, True, row, i + 1)
+                    
+
+        
+        
+        for col in range(10):
+            empty = np.count_nonzero(board.board[:, col] == 0)
+            if empty != 0:
+                other_pieces = 10 - np.count_nonzero(board.board[:, col] == 1) - empty 
+                if other_pieces + empty == board.col_number[col]:
+                    for i in range(7):
+                        if np.array_equal(board.board[:, col][i:i + 4], np.array([0, 0, 0, 0])):
+                            board.board[:, col][i : i + 4] = [2, 32, 32, 4]
+                            Bimaru.fill_around_t(board, True, i, col)
+                            Bimaru.fill_around_b(board, True, i + 3, col)
+                            break
+                    for i in range(8):
+                        if np.array_equal(board.board[:, col][i:i + 3], np.array([0, 0, 0])):
+                            board.board[:, col][i : i + 3] = [2, 32, 4]
+                            Bimaru.fill_around_t(board, True, i, col)
+                            Bimaru.fill_around_b(board, True, i + 2, col)
+                    for i in range(9):
+                        if np.array_equal(board.board[:, col][i:i + 2], np.array([0, 0])):
+                            board.board[:, col][i : i + 2] = [2, 4]
+                            Bimaru.fill_around_t(board, True, i, col)
+        
 
 
 
