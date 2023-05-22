@@ -20,7 +20,7 @@ Using the provided clues and following these rules, you gradually fill in the gr
 
 Bimaru puzzles can come in various sizes and difficulty levels, ranging from small grids with a few ships to larger grids with numerous ships. They provide an engaging and enjoyable exercise for logical thinking and problem-solving skills.
 
-This Project is a solver for the Bimaru Puzzle on a 10x10 grid with the following ships: 
+This Project is a solver for the Bimaru Puzzle on a **10x10** grid with the following ships: 
 - 4 ships with size one
 - 3 ships with size two
 - 2 ships with size three
