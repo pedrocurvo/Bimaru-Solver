@@ -493,10 +493,7 @@ class Bimaru(Problem):
     @staticmethod
     def fill_around_c(board: Board, coordinates = False, x = None, y = None):
         # Find Pieces
-        if coordinates:
-            coordinates_c = [(x, y)]
-        else:
-            coordinates_c = np.argwhere(board.board == 64)
+        coordinates_c = [(x, y)] if coordinates else np.argwhere(board.board == 64)
         for coordinate in coordinates_c:
             row, col = coordinate[0], coordinate[1]
             r_min, r_max = max(0, row - 1), min(10, row + 2)
@@ -507,10 +504,7 @@ class Bimaru(Problem):
     @staticmethod
     def fill_around_t(board: Board, coordinates = False, x = None, y = None):
         # Fill around T
-        if coordinates:
-            coordinates_t = [(x, y)]
-        else:
-            coordinates_t = np.argwhere(board.board == 2)
+        coordinates_t = [(x, y)] if coordinates else np.argwhere(board.board == 2)
         for coordinate in coordinates_t:
             row, col = coordinate[0], coordinate[1]
             row_range = range(max(0, row - 1), min(10, row + 3))
@@ -521,10 +515,7 @@ class Bimaru(Problem):
 
     @staticmethod
     def fill_around_b(board: Board, coordinates = False, x = None, y = None):
-        if coordinates:
-            coordinates_b = [(x, y)]
-        else:
-            coordinates_b = np.argwhere(board.board == 4)
+        coordinates_b = [(x, y)] if coordinates else np.argwhere(board.board == 4)
         for coordinate in coordinates_b:
                 row, col = coordinate[0], coordinate[1]
                 row_range = range(max(0, row - 2), min(10, row + 2))
@@ -535,10 +526,7 @@ class Bimaru(Problem):
 
     @staticmethod
     def fill_around_l(board: Board, coordinates = False, x = None, y = None):
-        if coordinates:
-            coordinates_l = [(x, y)]
-        else:
-            coordinates_l = np.argwhere(board.board == 8)
+        coordinates_l = [(x, y)] if coordinates else np.argwhere(board.board == 8)
         # Fill around L
         for coordinate in coordinates_l:
             row = coordinate[0]
@@ -551,10 +539,7 @@ class Bimaru(Problem):
 
     @staticmethod
     def fill_around_r(board: Board, coordinates = False, x = None, y = None):
-        if coordinates:
-            coordinates_r = [(x, y)]
-        else:
-            coordinates_r = np.argwhere(board.board == 16)
+        coordinates_r = [(x, y)] if coordinates else np.argwhere(board.board == 16)
         # Fill around R
         for coordinate in coordinates_r:
             row = coordinate[0]
