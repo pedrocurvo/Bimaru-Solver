@@ -39,25 +39,7 @@ This Project is a solver for the Bimaru Puzzle on a 10x10 grid with the followin
 | <img align="center" src="gifs/one_ship.gif" alt="One" title="Around One Piece" width="200" height="200" align="center"/>  |  <img align="center" src="gifs/left.gif" alt="Top" title="Around Top Piece" width="200" height="200" align="center" style="transform:rotate(90deg);"/>  | <img align="center" src="gifs/left.gif" alt="Right" title="Around Right Piece" width="200" height="200" align="center" style="transform:rotate(180deg);"/>  |
 | Middle Piece   |      Bottom Piece      |  Left Piece |
 | <img align="center" src="gifs/middle.gif" alt="Middle" title="Around Middle Piece" width="200" height="200" align="center"/>  | <img align="center" src="gifs/left.gif" alt="Bottom" title="Around Bottom Piece" width="200" height="200" align="center" style="transform:rotate(270deg);"/> | <img align="center" src="gifs/left.gif" alt="Left" title="Around Left Piece" width="200" height="200" align="center"/>  | 
-#### Around One Ship 
 
-
-
-#### Around Bottom Piece
-
-
-
-
-#### Around Top Piece
-
-
-#### Around Left Piece
-
-
-#### Around Right Piece
-
-
-#### Around Middle Piece
 
   
 - Terminal Pieces 
