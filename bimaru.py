@@ -3,7 +3,7 @@
 # Além das funções e classes já definidas, podem acrescentar outras que considerem pertinentes.
 
 # Grupo 102:
-# 00000 Pedro M. P. Curvo
+# 102716 Pedro M. P. Curvo
 # 00000 Nome2
 import itertools
 import sys

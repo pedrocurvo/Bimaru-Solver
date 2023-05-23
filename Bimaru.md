@@ -83,11 +83,12 @@ The gifs show how to fill the waters around specific pieces. The images are self
 
   
 ### 4.3 Terminal Pieces 
-- Terminal Rows 
-- Terminal Columns 
-- Fill Rows and Columns With Right Number of Pieces 
-- Empty Spaces 
-- Waters per Column and Row
+### 4.4 Terminal Rows 
+### 4.5 Terminal Columns 
+### 4.6 Fill Rows and Columns With Right Number of Pieces 
+### 4.7 Empty Spaces 
+### 4.8 Waters per Column and Row
+### Impossible Combinations
 
 ## Heuristic 
 
