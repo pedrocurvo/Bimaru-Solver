@@ -1,14 +1,9 @@
-import numpy as np
-import time
+from bimaru import Bimaru
+lista = []
+for i in range(10):
+    for j in range(10):
+        print(Bimaru.probabilistic_grid[i, j], ' | ', end='' )
 
-# Example array
-arr = np.array([[2, 0, 0, 0, 2, 0, 2, 3], [2, 3, 0, 5, 8, 9, 7, 6]])
-
-# Count the occurrences of a specific element
-empty = np.count_nonzero(arr[1] == 0)
-print(np.array_equal(arr[0][0:3],  [2, 0, 0]) ) # Output: 4
-arr[0][0:3] = [1, 1, 1]
-print(arr)
 
 
 
