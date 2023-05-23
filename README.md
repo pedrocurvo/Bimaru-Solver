@@ -90,7 +90,21 @@ The gifs show how to fill the waters around specific pieces. The images are self
 - Waters per Column and Row
 
 ## Heuristic 
- Probabilistic Grid
+
+It's important to refer that this problem is a CSP (Constraint Satisfaction Problem), so the constraints are very important to solve the problem and allow a faster execution of the algorithm. Such that the program can run fast only using the Non-Informed Search Algoritms. Beyond that aspect, is important to refer that a kind of 'intrisic' heuristic was used during the construction of the program, since it only gives actions for the 'next' boat that is missing, starting by the larger one, this allows a faster execution and a reduction in memory. This is a kind of heuristic that is not used in the h(n) function, but it's important to refer it. One may think of it has a kind of 'pre-processing' heuristic where initial the h(n) for larger boat is small and infinity for the other ones. 
+
+A side from that, some may implement an heuristic to choose the right boat from the same lenght ships that are not yet placed. While thinking about this, I thought about the following:
+- Parts of the grid that match with parts of the ships that are not yet placed
+- Probabilistic Density Distribution of the ships on the Grid
+  
+The first one is easier to implement, but the second one is quite a challenge, since this probability distribution is not static, it changes as the grid is filled. Since the goal of this project is to solve the puzzle, I decided to implement the first one with a static version of the second one, but for more information
+about the second one, you can check the links bellow to have an idea of how probability distributions can be used to solve this problem or to win the normal battleship game. 
+- [Battleship Probability Calculator](https://cliambrown.com/battleship/)
+- [Coding an Intelligent Battleship Agent](https://towardsdatascience.com/coding-an-intelligent-battleship-agent-bf0064a4b319)
+- [The Battleship Algorithm](https://www.youtube.com/watch?v=LbALFZoRrw8&t=88s)
+
+
+ **Probabilistic Grid** used for the h(n)
  <table align="center">
     <colgroup>
         <col span="2" style="background-color: #D6EEEE">
