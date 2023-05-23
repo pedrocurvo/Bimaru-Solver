@@ -1,5 +1,5 @@
 # Bimaru-Solver
-by Pedro Curvo (@pedrocurvo)
+by Pedro Curvo ([@pedrocurvo](https://github.com/pedrocurvo))
 
 This project is a solver for the Bimaru Puzzle and was developed as a project for the course of Artificial Intelligence at Instituto Superior Técnico.  
 The images used bellow and some ideas for constrains were given by playing the game on the app
@@ -217,3 +217,4 @@ The gifs show how to fill the waters around specific pieces. The images are self
         <td align="center" style="background-color: #FF8A8A">8.0</td>
     </tr>
 </table>
+
