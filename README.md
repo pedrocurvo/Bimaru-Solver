@@ -76,9 +76,9 @@ Numbers represent clues for each row. Example:
 The gifs show how to fill the waters around specific pieces. The images are self explanatory, but remind that the pieces can be on the edges of the grid, so while filling the waters around them, you should not go out of the grid.
 |     One Piece ```C```  |      Top Piece ```T```     |  Right Piece ```R``` |
 |:-----------------:|:---------------------:|:------:|
-| <img align="center" src="gifs/one_ship.gif" alt="One" title="Around One Piece" width="200" height="200" align="center"/>  |  <img align="center" src="gifs/top.gif" alt="Top" title="Around Top Piece" width="200" height="200" align="center"/>  | <img align="center" src="gifs/right.gif" alt="Right" title="Around Right Piece" width="200" height="200" align="center"/>  |
+| <img align="center" src="gifs/centre.gif" alt="One" title="Around One Piece" width="200" height="200" align="center"/>  |  <img align="center" src="gifs/top.gif" alt="Top" title="Around Top Piece" width="200" height="200" align="center"/>  | <img align="center" src="gifs/right.gif" alt="Right" title="Around Right Piece" width="200" height="200" align="center"/>  |
 | Middle Piece ```M```   |      Bottom Piece ```B```     |  Left Piece ```L``` |
-| <img align="center" src="gifs/middle.gif" alt="Middle" title="Around Middle Piece" width="200" height="200" align="center"/>  | <img align="center" src="gifs/bottom.gif" alt="Bottom" title="Around Bottom Piece" width="200" height="200" align="center" /> | <img align="center" src="gifs/left.gif" alt="Left" title="Around Left Piece" width="200" height="200" align="center"/>  | 
+| <img align="center" src="gifs/middle.GIF" alt="Middle" title="Around Middle Piece" width="200" height="200" align="center"/>  | <img align="center" src="gifs/bottom.gif" alt="Bottom" title="Around Bottom Piece" width="200" height="200" align="center" /> | <img align="center" src="gifs/left.gif" alt="Left" title="Around Left Piece" width="200" height="200" align="center"/>  | 
 
 
   
