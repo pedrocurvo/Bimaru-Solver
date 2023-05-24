@@ -240,3 +240,37 @@ about the second one, you can check the links bellow to have an idea of how prob
     </tr>
 </table>
 
+## 6. Classes and Suctrure of the Code 
+The code is divided into 3 main classes:
+1. **BimaruState** representing states in the Bimaru problem/in the search algorithms.
+2. **Board** representing the board of the Bimaru problem, in this case the 10x10 grid with the boards.
+3. **Bimaru** which is a derived class from **Problem**. The **Problem** class is a part of the AIMA code,
+and is used to represent a problem in the search algorithms. The **Bimaru** class is used to represent the
+Bimaru problem, and is used by the search algorithms to solve the problem. The functions that are overriden are:
+   - **actions(state)** - returns a list of all the possible actions that can be done in the current state.
+   - **result(state, action)** - returns the state that is the result of doing the action in the current state.
+   - **goal_test(state)** - returns true if the state is a goal state, and false otherwise.
+
+The code works by creating a **Bimaru** object, and then calling the search algorithms on it. In steps the code does the following:
+1. Creates a **Board** object with the txt file that is given as input using the function ***Board.parse_instance()***.
+2. Creates the **Bimaru** object (hereby treated as problem) with the **Board** object as input. This board instance is used to create a **BimaruState** object, which is the initial state of the problem, attributed as problem.initial
+3. The problem has also a number of expected ships **problem.expected_ships** that is used to guide the board and it will
+helpeful in the goal_test function.
+4. When creating the initial state we also create a list with the number of ships that are already on the board, since
+the initial state can be filled already with some ships of unknown type from lenght 1 to 4.
+5. Then the search alghoritm calls the action function on the initial state, and the result is a list of possible actions:
+- In order to otimize the search, I deciced to only give actions with a specific type of ship, and not all the possible actions.
+That is, if the 4 ship is missing we start by only sending actions with a 4 ship, and then we move to the 3 ship, and so on.
+- It's important to refer that the first type and the last type of action are created inside the actions functions, since we
+minimize the effort and time to build them, the 4 ships have few options so it wont take long to create them, and the 1 ship
+even though it's te most common ship, it's putted last so we only needed to check the missing spaces, each, in the end, are a few. 
+The boats with lenght in the middle are created in the beginning of the creation of the Bimaru problem, since they are
+harder to create and take more time to be created recurseveli. So, if we create all the options for those ships in the beginning
+and then only check the ones that can fit we can minimize the time to create the options.
+6. Then the search algorithm calls the result function on the initial state and the action, and the result is a new state.
+It's important to refer that the result funtion only joins the board, incremment the number of ships and then fill the water
+in the collumns and rows that are affected by the new ship and became full.
+7. It is also important to refer that the actions created in the actions are only the possible ones, without the ones that
+are could have broke restrictions.
+8. Since we only add possible actions and never impossible cases for the game, the goal_test function only needs to check 
+if the number of ships on the board are the same as the expected number of ships.

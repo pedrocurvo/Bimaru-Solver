@@ -338,21 +338,6 @@ class Bimaru(Problem):
     
         #if h_common_values != 0: return 10 / np.sum(matrix2) / h_common_values
         return (1 + h_common_values) * np.sum(matrix2) * 10 / 100
-        # This is the last newest heuristic
-        matrix3 = np.where(np.isin(node.parent.state.board, [0, 1]), 0, 1)
-        matrix3 = np.where(np.isin(node.action.board, [0]), 0, 1)
-        return 5 - h_common_values
-
-
-
-
-
-        return abs(100 - np.sum(matrix2) * 10)
-        return 10 / np.sum(matrix2) / h_common_values
-        return abs(100 - np.sum(matrix2) * 10)
-        value = round(((np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization - 3) * 100 )
-        return 10 - (np.sum(matrix) * 0.3 + np.sum(matrix2) * 0.7) * 10 / Bimaru.normalization
-        return 10 - value 
 
     @staticmethod
     def initial_fill(board: Board):
