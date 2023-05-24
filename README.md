@@ -5,6 +5,13 @@ This project is a solver for the Bimaru Puzzle and was developed as a project fo
 The images used bellow and some ideas for constrains were given by playing the game on the app
 _Sea Battle_ by _AculApps_ available on the [App Store](https://apps.apple.com/pt/app/sea-battle-unlimited/id6444275561?l=en) and [Play Store](https://play.google.com/store/apps/details?id=ch.aculapps.seabattleunlimited&hl=en).
 
+## Table of Contents
+1. [What is Bimaru?](#1-what-is-bimaru)
+2. [Input Format](#2-input-format)
+3. [Output Format](#3-output-format)
+4. [Constraints](#4-constraints)
+5. [Heuristic](#5-heuristic)
+
 ## 1. What is Bimaru?
 A **Bimaru puzzle**, also known as **Battleship Solitaire** or **Battleships**, is a logic-based puzzle that involves filling a grid with ships while satisfying certain clues or hints provided. It is played on a rectangular grid, typically square in shape.  
 The objective of a Bimaru puzzle is to place a fleet of battleships (or ships) within the grid, following specific rules. The grid is divided into cells, and each cell can either contain a ship segment or be empty. The ships in the puzzle are represented by connected segments, either horizontally or vertically, without touching each other.
@@ -88,9 +95,9 @@ The gifs show how to fill the waters around specific pieces. The images are self
 ### 4.6 Fill Rows and Columns With Right Number of Pieces 
 ### 4.7 Empty Spaces 
 ### 4.8 Waters per Column and Row
-### Impossible Combinations
+### 4.9 Impossible Combinations
 
-## Heuristic 
+## 5. Heuristic 
 
 It's important to refer that this problem is a CSP (Constraint Satisfaction Problem), so the constraints are very important to solve the problem and allow a faster execution of the algorithm. Such that the program can run fast only using the Non-Informed Search Algoritms. Beyond that aspect, is important to refer that a kind of 'intrisic' heuristic was used during the construction of the program, since it only gives actions for the 'next' boat that is missing, starting by the larger one, this allows a faster execution and a reduction in memory. This is a kind of heuristic that is not used in the h(n) function, but it's important to refer it. One may think of it has a kind of 'pre-processing' heuristic where initial the h(n) for larger boat is small and infinity for the other ones. 
 
@@ -139,10 +146,10 @@ about the second one, you can check the links bellow to have an idea of how prob
         <td align="center" style="background-color: #FF2E2E">14.3</td>
         <td align="center" style="background-color: #FF0000">16.6</td>
         <td align="center" style="background-color: #A30000">18.4</td>
-        <td align="center">19.4</td>
-        <td align="center">19.9</td>
-        <td align="center">19.9</td>
-        <td align="center">19.4</td>
+        <td align="center" style="background-color: #9B111E">19.4</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #9B111E">19.4</td>
         <td align="center" style="background-color: #A30000">18.4</td>
         <td align="center" style="background-color: #FF0000">16.6</td>
         <td align="center" style="background-color: #FF2E2E">14.3</td>
@@ -150,48 +157,48 @@ about the second one, you can check the links bellow to have an idea of how prob
     <tr>
         <td align="center" style="background-color: #FF0000">15.9</td>
         <td align="center" style="background-color: #D10000">17.8</td>
-        <td align="center">19.4</td>
-        <td align="center">20.4</td>
-        <td align="center">21.0</td>
-        <td align="center">21.0</td>
-        <td align="center">20.4</td>
-        <td align="center">19.4</td>
+        <td align="center" style="background-color: #9B111E">19.4</td>
+        <td align="center" style="background-color: #4C0805">20.4</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #4C0805">20.4</td>
+        <td align="center" style="background-color: #9B111E">19.4</td>
         <td align="center" style="background-color: #D10000">17.8</td>
         <td align="center" style="background-color: #FF0000">15.9</td>
     </tr>
     <tr>
         <td align="center" style="background-color: #FF0000">16.7</td>
         <td align="center" style="background-color: #A30000">18.4</td>
-        <td align="center">19.9</td>
-        <td align="center">21.0</td>
-        <td align="center">21.6</td>
-        <td align="center">21.6</td>
-        <td align="center">21.0</td>
-        <td align="center">19.9</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #420D09">21.6</td>
+        <td align="center" style="background-color: #420D09">21.6</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #960018">19.9</td>
         <td align="center" style="background-color: #A30000">18.4</td>
         <td align="center" style="background-color: #FF0000">16.7</td>
     </tr>
     <tr>
         <td align="center" style="background-color: #FF0000">16.7</td>
         <td align="center" style="background-color: #A30000">18.4</td>
-        <td align="center">19.9</td>
-        <td align="center">21.0</td>
-        <td align="center">21.6</td>
-        <td align="center">21.6</td>
-        <td align="center">21.0</td>
-        <td align="center">19.9</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #420D09">21.6</td>
+        <td align="center" style="background-color: #420D09">21.6</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #960018">19.9</td>
         <td align="center" style="background-color: #A30000">18.4</td>
         <td align="center" style="background-color: #FF0000">16.7</td>
     </tr>
     <tr>
         <td align="center" style="background-color: #FF0000">15.9</td>
         <td align="center" style="background-color: #D10000">17.8</td>
-        <td align="center">19.4</td>
-        <td align="center">20.4</td>
-        <td align="center">21.0</td>
-        <td align="center">21.0</td>
-        <td align="center">20.4</td>
-        <td align="center">19.4</td>
+        <td align="center" style="background-color: #9B111E">19.4</td>
+        <td align="center" style="background-color: #4C0805">20.4</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #4C0805">21.0</td>
+        <td align="center" style="background-color: #4C0805">20.4</td>
+        <td align="center" style="background-color: #9B111E">19.4</td>
         <td align="center" style="background-color: #D10000">17.8</td>
         <td align="center" style="background-color: #FF0000">15.9</td>
     </tr>
@@ -199,10 +206,10 @@ about the second one, you can check the links bellow to have an idea of how prob
         <td align="center" style="background-color: #FF2E2E">14.3</td>
         <td align="center" style="background-color: #FF0000">16.6</td>
         <td align="center" style="background-color: #A30000">18.4</td>
-        <td align="center">19.4</td>
-        <td align="center">19.9</td>
-        <td align="center">19.9</td>
-        <td align="center">19.4</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #960018">19.9</td>
+        <td align="center" style="background-color: #960018">19.9</td>
         <td align="center" style="background-color: #A30000">18.4</td>
         <td align="center" style="background-color: #FF0000">16.6</td>
         <td align="center" style="background-color: #FF2E2E">14.3</td>

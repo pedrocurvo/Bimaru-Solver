@@ -757,11 +757,6 @@ class Bimaru(Problem):
 if __name__ == "__main__":
     board = Board.parse_instance()
     problem = Bimaru(board)
+    #goal_node = depth_first_tree_search(problem)
     goal_node = astar_search(problem)
-    '''
-    if len(problem.initial.board.hints) > 2:
-        goal_node = depth_first_tree_search(problem)
-    else:
-        goal_node = astar_search(problem)
-    '''
     goal_node.state.print()
