@@ -329,14 +329,8 @@ class Bimaru(Problem):
         common_values = np.where(node.action.board == node.parent.state.board.board, 1, 0)
         common_values = np.where(node.action.board == 1, 0, common_values) # added last
         h_common_values = np.sum(common_values)
-        
-
-        #matrix = np.where(node.state.board == 0, 0, Bimaru.probabilistic_grid)
-        #matrix = np.where(node.state.board == 1, 0, matrix)
         matrix2 = np.where(node.action.board == 0, 0, Bimaru.probabilistic_grid)
         matrix2 = np.where(node.action.board == 1, 0, matrix2)
-    
-        #if h_common_values != 0: return 10 / np.sum(matrix2) / h_common_values
         return (1 + h_common_values) * np.sum(matrix2) * 10 / 100
 
     @staticmethod
