@@ -11,6 +11,8 @@ _Sea Battle_ by _AculApps_ available on the [App Store](https://apps.apple.com/p
 3. [Output Format](#3-output-format)
 4. [Constraints](#4-constraints)
 5. [Heuristic](#5-heuristic)
+6. [Classes](#6-classes)
+7. [Test](#7-test)
 
 ## 1. What is Bimaru?
 A **Bimaru puzzle**, also known as **Battleship Solitaire** or **Battleships**, is a logic-based puzzle that involves filling a grid with ships while satisfying certain clues or hints provided. It is played on a rectangular grid, typically square in shape.  
@@ -266,3 +268,9 @@ The code works by creating a `Bimaru` object and then calling search algorithms 
 7. The generated actions only include valid options, excluding those that violate restrictions.
 8. The goal_test function checks if the number of ships on the board matches the expected number of ships, as only valid actions are added.
 
+## 7. Test
+To test the code for several instances at the same and have an idea of the average of the time it takes to execute, run the following command:
+```
+python3 time_test.py
+```
+This will run the code for 30 instances and print the average time it took to execute the code for each search algorithm.
